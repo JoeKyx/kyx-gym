@@ -3,6 +3,8 @@ import * as React from 'react';
 
 import '@/styles/globals.css';
 
+import { AuthProvider } from '@/components/context/AuthContext';
+
 import { siteConfig } from '@/constant/config';
 
 export const metadata: Metadata = {
@@ -51,7 +53,9 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <body className='bg-indigo-100'>{children}</body>
+      <AuthProvider>
+        <body className='bg-indigo-100'>{children}</body>
+      </AuthProvider>
     </html>
   );
 }
