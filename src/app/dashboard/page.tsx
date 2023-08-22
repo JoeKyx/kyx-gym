@@ -1,16 +1,30 @@
-import MainNav from '@/components/navbar/MainNav';
-import Heading from '@/components/text/Heading';
+import { FC } from 'react';
 
-const page = () => {
+import Dashboard from '@/components/dashboard/Dashboard';
+import DashboardMobile from '@/components/dashboard/DashboardMobile';
+import MainNav from '@/components/navbar/MainNav';
+
+const page: FC = async () => {
+  // const supabase = createServerComponentClient<Database>({
+  //   cookies,
+  // });
+
+  // const { data: { session }, } = await supabase.auth.getSession();
+
+  // if (!session) {
+  //   redirect("/login")
+  // }
+
   return (
-    <>
-      <MainNav />
-      <div>
-        <Heading size='default' className='md:text-center'>
-          Welcome to Kyx Gym
-        </Heading>
+    <div>
+      <div className='hidden md:block'>
+        <MainNav className='mb-4 hidden w-full rounded-md bg-white p-3 opacity-75 shadow-lg md:block' />
+        <Dashboard className='flex h-[80vh] flex-col gap-4 md:mx-4 md:flex-row ' />
       </div>
-    </>
+      <div>
+        <DashboardMobile className='block md:hidden' />
+      </div>
+    </div>
   );
 };
 

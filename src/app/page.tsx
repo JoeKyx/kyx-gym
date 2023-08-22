@@ -1,28 +1,59 @@
 'use client';
 
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import Heading from '@/components/text/Heading';
-
-/**
- * SVGR Support
- * Caveat: No React Props Type.
- *
- * You can override the next-env if the type is important to you
- * @see https://stackoverflow.com/questions/68103844/how-to-override-next-js-svg-module-declaration
- */
-
-// Before you begin editing, follow all comments with `STARTERCONF`,
-// to customize the default configuration.
-
+import AuthForm from '@/components/AuthForm';
 export default function HomePage() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [_loading, setLoading] = useState(true);
+
+  const [hydrated, setHydrated] = React.useState(false);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.onloadeddata = () => {
+        setLoading(false);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated)
+    return (
+      <div className='flex h-screen w-screen flex-col items-center justify-center'>
+        <Loader2 className='animate-spin' size={200} />
+      </div>
+    );
+
   return (
-    <main className='mx-5 mt-28 flex flex-col'>
-      <Heading size='default' className='md:text-center'>
-        Welcome to Kyx Gym
-      </Heading>
-      {/* Create a Login Button */}
-      {/* Create a Register Button */}
-    </main>
+    <div className='relative h-screen w-screen overflow-hidden'>
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        src='/videos/bg_vid.mp4'
+        className='absolute inset-0 z-0 h-full w-full object-cover'
+      />
+      <div className='absolute inset-0 z-10 bg-black opacity-80'></div>
+
+      <main className='relative z-20 mx-5 flex flex-col items-center'>
+        <Image
+          src='/images/kgLogo.png'
+          height={300}
+          width={300}
+          alt='Kyx Gym Logo'
+        />
+        <div className='md:mx-auto md:w-1/2 md:items-center md:justify-center'>
+          <AuthForm />
+        </div>
+      </main>
+    </div>
   );
 }

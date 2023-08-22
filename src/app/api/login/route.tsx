@@ -3,14 +3,12 @@ import { cookies, headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { customInitApp } from '@/lib/firebase-admin-config';
-import logger from '@/lib/logger';
 
 // Init the Firebase SDK every time the server is called
 customInitApp();
 
 export async function POST(_req: NextRequest, _response: NextResponse) {
   const authorization = headers().get('Authorization');
-  logger(authorization, 'POST /api/login: authorization');
   if (authorization?.startsWith('Bearer ')) {
     const idToken = authorization.split('Bearer ')[1];
 
@@ -29,7 +27,6 @@ export async function POST(_req: NextRequest, _response: NextResponse) {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
       };
-      logger(options, 'route.tsx line 37');
 
       cookies().set(options);
     }
@@ -40,15 +37,13 @@ export async function POST(_req: NextRequest, _response: NextResponse) {
 
 export async function GET(_req: NextRequest) {
   const session = cookies().get('session');
-  logger(session, 'route.tsx line 40');
 
   if (!session) {
     return NextResponse.json({ isLoggedIn: false }, { status: 401 });
   }
 
   // Use Firebase Admin to validate the session cookie
-  logger(session.value, 'route.tsx line 46');
-  const decodedClaims = await auth().verifySessionCookie(session.value, true);
+  const decodedClaims = await auth().verifyIdToken(session.value, true);
 
   if (!decodedClaims) {
     return NextResponse.json({ isLoggedIn: false }, { status: 401 });

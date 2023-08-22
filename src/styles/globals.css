@@ -5,26 +5,28 @@
 :root {
   /* #region  /**=========== Primary Color =========== */
   /* ! TODO Customize these variable, copy and paste from /styles/colors.css for list of colors */
-  --tw-color-primary-50: 240 249 255;
-  --tw-color-primary-100: 224 242 254;
-  --tw-color-primary-200: 186 230 253;
-  --tw-color-primary-300: 125 211 252;
-  --tw-color-primary-400: 56 189 248;
-  --tw-color-primary-500: 14 165 233;
-  --tw-color-primary-600: 2 132 199;
-  --tw-color-primary-700: 3 105 161;
-  --tw-color-primary-800: 7 89 133;
-  --tw-color-primary-900: 12 74 110;
-  --color-primary-50: rgb(var(--tw-color-primary-50)); /* #f0f9ff */
-  --color-primary-100: rgb(var(--tw-color-primary-100)); /* #e0f2fe */
-  --color-primary-200: rgb(var(--tw-color-primary-200)); /* #bae6fd */
-  --color-primary-300: rgb(var(--tw-color-primary-300)); /* #7dd3fc */
-  --color-primary-400: rgb(var(--tw-color-primary-400)); /* #38bdf8 */
-  --color-primary-500: rgb(var(--tw-color-primary-500)); /* #0ea5e9 */
-  --color-primary-600: rgb(var(--tw-color-primary-600)); /* #0284c7 */
-  --color-primary-700: rgb(var(--tw-color-primary-700)); /* #0369a1 */
-  --color-primary-800: rgb(var(--tw-color-primary-800)); /* #075985 */
-  --color-primary-900: rgb(var(--tw-color-primary-900)); /* #0c4a6e */
+  --tw-color-primary-50: 240 253 250;
+  --tw-color-primary-100: 204 251 241;
+  --tw-color-primary-200: 153 246 228;
+  --tw-color-primary-300: 94 234 212;
+  --tw-color-primary-400: 45 212 191;
+  --tw-color-primary-500: 20 184 166;
+  --tw-color-primary-600: 13 148 136;
+  --tw-color-primary-700: 15 118 110;
+  --tw-color-primary-800: 17 94 89;
+  --tw-color-primary-900: 19 78 74;
+  --tw-color-primary-950: 4 47 46;
+  --color-primary-50: rgb(var(--tw-color-primary-50)); /* #f0fdfa */
+  --color-primary-100: rgb(var(--tw-color-primary-100)); /* #ccfbf1 */
+  --color-primary-200: rgb(var(--tw-color-primary-200)); /* #99f6e4 */
+  --color-primary-300: rgb(var(--tw-color-primary-300)); /* #5eead4 */
+  --color-primary-400: rgb(var(--tw-color-primary-400)); /* #2dd4bf */
+  --color-primary-500: rgb(var(--tw-color-primary-500)); /* #14b8a6 */
+  --color-primary-600: rgb(var(--tw-color-primary-600)); /* #0d9488 */
+  --color-primary-700: rgb(var(--tw-color-primary-700)); /* #0f766e */
+  --color-primary-800: rgb(var(--tw-color-primary-800)); /* #115e59 */
+  --color-primary-900: rgb(var(--tw-color-primary-900)); /* #134e4a */
+  --color-primary-950: rgb(var(--tw-color-primary-950)); /* #042f2e */
   /* #endregion  /**======== Primary Color =========== */
 }
 
@@ -115,4 +117,88 @@
   .animated-underline:focus-visible {
     background-size: 0 2px, 100% 2px;
   }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 215 20.2% 65.1%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 216 34% 17%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+}
+
+/* #region  /**=========== My Styles =========== */
+.SelectContent {
+  width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height);
 }

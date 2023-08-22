@@ -7,12 +7,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
-  // Uncoment to add domain whitelist
-  // images: {
-  //   domains: [
-  //     'res.cloudinary.com',
-  //   ],
-  // },
+  images: {
+    domains: ['lh3.googleusercontent.com'],
+  },
 
   webpack(config) {
     // Grab the existing rule that handles SVG imports
@@ -36,6 +33,18 @@ const nextConfig = {
         options: {
           dimensions: false,
           titleProp: true,
+        },
+      },
+      {
+        test: /\.mp3$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/_next/static/sounds/',
+            outputPath: 'static/sounds/',
+            name: '[name].[ext]',
+            esModule: false,
+          },
         },
       }
     );

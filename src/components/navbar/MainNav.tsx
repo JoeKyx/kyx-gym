@@ -1,29 +1,33 @@
-import Image from 'next/image';
-import React from 'react';
+import React, { FC, forwardRef, HTMLAttributes } from 'react';
 
+import ProfileIcon from '@/components/dashboard/ProfileIcon';
+import Username from '@/components/dashboard/Username';
 import PrimaryLink from '@/components/links/PrimaryLink';
 
-export default function MainNav() {
-  return (
-    <div className='fixed left-4 right-4 top-5 z-50 mx-auto rounded-md bg-white p-3 opacity-75 shadow-lg'>
-      <nav className='flex items-center justify-start gap-4'>
-        <div>
-          <Image
-            priority
-            src='/images/kgLogo.png'
-            alt='Kyx Gym Logo'
-            width={50}
-            height={50}
-          />
-        </div>
-        <div>
-          <PrimaryLink href='/'>Home</PrimaryLink>
-        </div>
-        <div>
-          <PrimaryLink href='/about'>About</PrimaryLink>
-        </div>
-        {/* Add more links as necessary */}
-      </nav>
-    </div>
-  );
-}
+type MainNavProps = HTMLAttributes<HTMLDivElement>;
+
+const MainNav: FC<MainNavProps> = forwardRef<HTMLDivElement, MainNavProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div className={className} ref={ref} {...props}>
+        <nav className='flex items-center justify-start gap-4'>
+          <div className='flex items-center gap-4'>
+            <ProfileIcon className='border-primary-500 rounded-full border' />
+            <span>
+              Welcome <Username className='font-semibold' />!
+            </span>
+          </div>
+          <div>
+            <PrimaryLink href='/dashboard'>Home</PrimaryLink>
+          </div>
+          <div>
+            <PrimaryLink href='/about'>About</PrimaryLink>
+          </div>
+          {/* Add more links as necessary */}
+        </nav>
+      </div>
+    );
+  }
+);
+
+export default MainNav;

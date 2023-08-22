@@ -18,6 +18,8 @@
 # misc
 .DS_Store
 *.pem
+firebaseSAconfig.json
+
 
 # debug
 npm-debug.log*
@@ -41,6 +43,5 @@ robots.txt
 sitemap.xml
 sitemap-*.xml
 
-# firebase config
-firebaseSAconfig.json
+# firebase
 firebaseSAconfig.json
