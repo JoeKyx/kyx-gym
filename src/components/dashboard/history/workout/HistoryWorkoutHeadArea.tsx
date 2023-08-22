@@ -10,6 +10,7 @@ import { saveAsTemplateToDB, updateWorkoutInDB } from '@/lib/supabase-util';
 import { getAllMuscles, totalWeightLifted } from '@/lib/workout-util';
 
 import IconButton from '@/components/buttons/IconButton';
+import { UserProfile } from '@/components/context/SocialContext';
 import UserDisplay from '@/components/dashboard/UserDisplay';
 import WorkoutName from '@/components/dashboard/WorkoutName';
 import WorkoutRating from '@/components/dashboard/WorkoutRating';
@@ -20,7 +21,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/Popover';
 
-import { UserProfile } from '@/types/UserProfile';
 import { Workout } from '@/types/Workout';
 type HistoryWorkoutHeadAreaProps = HTMLAttributes<HTMLDivElement> & {
   workout: Workout;

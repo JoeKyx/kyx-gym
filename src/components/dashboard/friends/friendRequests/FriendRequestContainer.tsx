@@ -3,13 +3,11 @@ import { Trash2Icon, UserPlus } from 'lucide-react';
 import { FC, useEffect, useState } from 'react';
 
 import IconButton from '@/components/buttons/IconButton';
-import { useSocial } from '@/components/context/SocialContext';
+import { UserProfile, useSocial } from '@/components/context/SocialContext';
 import AvatarDisplay from '@/components/dashboard/AvatarDisplay';
 
-import { Database } from '@/types/supabase';
-
 type FriendRequestContainerProps = {
-  friend: Database['public']['Tables']['userprofile']['Row'];
+  friend: UserProfile;
 };
 
 const FriendContainer: FC<FriendRequestContainerProps> = ({ friend }) => {
@@ -45,7 +43,9 @@ const FriendContainer: FC<FriendRequestContainerProps> = ({ friend }) => {
     <div className='border-primary-500 hover:bg-primary-200 flex w-full  items-center gap-4 border-t px-3 py-2 transition-colors duration-200 ease-in-out'>
       <AvatarDisplay
         imageUrl={
-          friend.profilepic ? friend.profilepic : '/images/avatars/default.jpeg'
+          friend.profile_icons
+            ? `/images/avatars/${friend.profile_icons.path}`
+            : '/images/avatars/default.jpeg'
         }
         alt={`Avatar of ${friend.username}`}
       />

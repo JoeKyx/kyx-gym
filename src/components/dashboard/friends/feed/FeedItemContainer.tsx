@@ -4,13 +4,12 @@ import Link from 'next/link';
 import { FC, useEffect, useState } from 'react';
 import React from 'react';
 
-import { useSocial } from '@/components/context/SocialContext';
+import { UserProfile, useSocial } from '@/components/context/SocialContext';
 import AvatarDisplay from '@/components/dashboard/AvatarDisplay';
 
 import { Database } from '@/types/supabase';
 
 type Feed = Database['public']['Tables']['feedprofile']['Row'];
-type UserProfile = Database['public']['Tables']['userprofile']['Row'];
 
 type FeedItemProps = {
   feedItem: Feed;
@@ -32,11 +31,11 @@ const FeedItemContainer: FC<FeedItemProps> = ({ feedItem }) => {
   // See whether the friend list of the user contains the user of the FeedItem, if yes get the avatar of the user
 
   const avatar =
-    friend && friend.profilepic
-      ? friend.profilepic
+    friend && friend.profile_icons
+      ? `/images/avatars/${friend.profile_icons.path}`
       : '/images/avatars/default.jpeg';
 
-  const TextComponent = (): React.ReactNode => {
+  const TextComponent = (): JSX.Element | null => {
     if (!feedItem.text) return null;
 
     // Pattern now includes USER@<alphanumeric> and WORKOUT@<numbers>

@@ -1,6 +1,5 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { FC } from 'react';
 
 import logger from '@/lib/logger';
 
@@ -14,8 +13,9 @@ interface pageProps {
     username: string;
   };
 }
+export const dynamic = 'force-dynamic';
 
-const page: FC<pageProps> = async ({ params, children }) => {
+export default async function Layout({ params, children }: pageProps) {
   const loadUserProfile = async () => {
     const supabase = createServerComponentClient<Database>({
       cookies,
@@ -76,6 +76,4 @@ const page: FC<pageProps> = async ({ params, children }) => {
       {children}
     </ProfileProvider>
   );
-};
-
-export default page;
+}

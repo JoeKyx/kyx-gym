@@ -1,6 +1,5 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { FC } from 'react';
 
 import logger from '@/lib/logger';
 
@@ -17,7 +16,9 @@ interface pageProps {
   };
 }
 
-const page: FC<pageProps> = async ({ params }) => {
+export const dynamic = 'force-dynamic';
+
+export default async function Page({ params }: pageProps) {
   async function getWorkout() {
     let errorLoading = false;
     const supabase = createServerComponentClient<Database>({
@@ -82,6 +83,4 @@ const page: FC<pageProps> = async ({ params }) => {
       </ButtonLink>
     </div>
   );
-};
-
-export default page;
+}

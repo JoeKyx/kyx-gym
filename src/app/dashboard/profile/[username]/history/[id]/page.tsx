@@ -1,6 +1,5 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { FC } from 'react';
 
 import HistoryWorkout from '@/components/dashboard/history/workout/HistoryWorkout';
 
@@ -10,8 +9,8 @@ interface pageProps {
     id: string;
   };
 }
-
-const page: FC<pageProps> = async ({ params }) => {
+export const dynamic = 'force-dynamic';
+export default async function Page({ params }: pageProps) {
   const loadWorkout = async () => {
     const supabase = createServerComponentClient<Database>({
       cookies,
@@ -40,6 +39,4 @@ const page: FC<pageProps> = async ({ params }) => {
       <HistoryWorkout workout={workout.data} />
     </main>
   );
-};
-
-export default page;
+}

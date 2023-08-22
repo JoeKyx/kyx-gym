@@ -40,8 +40,6 @@
     "clsx": "^1.2.1",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
-    "firebase": "^8.6.8",
-    "firebase-admin": "^11.10.1",
     "js-cookie": "^3.0.5",
     "kyx-gym-shared-types": "file:../Kyx Gym shared types",
     "lodash": "^4.17.21",

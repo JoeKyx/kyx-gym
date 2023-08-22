@@ -6,7 +6,7 @@ import { SocialProvider } from '@/components/context/SocialContext';
 import FirstLoginModal from '@/components/dashboard/FirstLoginModal';
 
 import { Database } from '@/types/supabase';
-
+export const dynamic = 'force-dynamic';
 export default async function RootLayout({
   children,
 }: {

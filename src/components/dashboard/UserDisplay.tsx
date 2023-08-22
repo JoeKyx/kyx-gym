@@ -4,9 +4,8 @@ import { HTMLAttributes } from 'react';
 
 import { cn } from '@/lib';
 
+import { UserProfile } from '@/components/context/SocialContext';
 import AddFriendButton from '@/components/dashboard/friends/AddFriendButton';
-
-import { UserProfile } from '@/types/UserProfile';
 
 type UserDisplayProps = HTMLAttributes<HTMLDivElement> & {
   userProfile: UserProfile;
@@ -26,8 +25,8 @@ const UserDisplay: FC<UserDisplayProps> = forwardRef<
     >
       <Image
         src={
-          userProfile.profilepic
-            ? userProfile.profilepic
+          userProfile.profile_icons
+            ? `/images/avatars/${userProfile.profile_icons}`
             : '/images/avatars/default.jpeg'
         }
         alt='Profile'
@@ -37,7 +36,7 @@ const UserDisplay: FC<UserDisplayProps> = forwardRef<
       />
       <AddFriendButton
         userId={userProfile.userid}
-        friendName={userProfile.username}
+        _friendName={userProfile.username}
       />
     </div>
   );
