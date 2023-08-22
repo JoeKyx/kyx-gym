@@ -69,11 +69,14 @@ const LastWorkouts: FC<LastWorkoutsProps> = forwardRef<
     logger(selectedMainMuscle, 'Selected muscle');
   }, [selectedMainMuscle]);
 
-  if (profileContext.userProfile === null) return;
-  <div className='items-col h-full w-full items-center justify-center'>
-    <Loader2 className='animate-spin' size={64} />
-    <WorkoutTip />
-  </div>;
+  if (profileContext.userProfile === null) {
+    return (
+      <div className='items-col h-full w-full items-center justify-center'>
+        <Loader2 className='animate-spin' size={64} />
+        <WorkoutTip />
+      </div>
+    );
+  }
 
   return (
     <div className={className} ref={ref} {...props}>
