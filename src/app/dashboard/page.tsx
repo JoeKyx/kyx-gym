@@ -4,17 +4,7 @@ import Dashboard from '@/components/dashboard/Dashboard';
 import DashboardMobile from '@/components/dashboard/DashboardMobile';
 import MainNav from '@/components/navbar/MainNav';
 
-const page: FC = async () => {
-  // const supabase = createServerComponentClient<Database>({
-  //   cookies,
-  // });
-
-  // const { data: { session }, } = await supabase.auth.getSession();
-
-  // if (!session) {
-  //   redirect("/login")
-  // }
-
+const page: FC = () => {
   return (
     <div>
       <div className='hidden md:block'>
