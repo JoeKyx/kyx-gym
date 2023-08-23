@@ -297,10 +297,12 @@ export async function createNewWorkoutItems(
       .select('position')
       .eq('workout', workout_id)
       .order('position', { ascending: false })
+      .limit(1)
       .single();
     if (error) {
+      logger('Error when trying to get position');
       logger(error || 'No data');
-      return null;
+      positionInWorkout = 1;
     }
     if (!data) {
       positionInWorkout = 1;
@@ -324,6 +326,7 @@ export async function createNewWorkoutItems(
     .select();
 
   if (error || !data || !data[0]) {
+    logger('Error when trying to insert workout items');
     logger(error || 'No id returned');
     return null;
   }
