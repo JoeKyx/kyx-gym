@@ -6,6 +6,8 @@ import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import AuthForm from '@/components/AuthForm';
+
+import { isProd } from '@/constant/env';
 export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [_loading, setLoading] = useState(true);
@@ -44,6 +46,7 @@ export default function HomePage() {
       <div className='absolute inset-0 z-10 bg-black opacity-80'></div>
 
       <main className='relative z-20 mx-5 flex flex-col items-center'>
+        <span className='text-white'>Are we prod? {isProd ? 'Yes' : 'No'}</span>
         <Image
           src='/images/kgLogo.png'
           height={300}

@@ -4,6 +4,8 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import React from 'react';
 
+import logger from '@/lib/logger';
+
 import { isProd } from '@/constant/env';
 
 export default function AuthForm() {
@@ -15,6 +17,16 @@ export default function AuthForm() {
   }, []);
 
   if (!hydrated) return null;
+
+  logger(isProd, 'isProd');
+  logger(
+    process.env.NEXT_PUBLIC_DEPLOYMENT_URL_PROD,
+    'process.env.NEXT_PUBLIC_DEPLOYMENT_URL_PROD'
+  );
+  logger(
+    process.env.NEXT_PUBLIC_DEPLOYMENT_URL_DEV,
+    'process.env.NEXT_PUBLIC_DEPLOYMENT_URL_DEV'
+  );
 
   return (
     <Auth

@@ -1,4 +1,7 @@
-export const isProd = process.env.NODE_ENV === 'production';
+export const isProd =
+  process.env.NODE_ENV === 'production'
+    ? true
+    : process.env.NEXT_PUBLIC_ENV === 'production' ?? false;
 export const isLocal = process.env.NODE_ENV === 'development';
 
 export const showLogger = isLocal
