@@ -36,7 +36,11 @@ const ProfileTab: FC<ProfileTabProps> = forwardRef<
     >
       <MobileImageButton
         title='Your Profile'
-        image='/images/avatars/default.jpeg'
+        image={
+          socialContext?.userProfile?.profile_icons?.path
+            ? `/images/avatars/${socialContext?.userProfile?.profile_icons?.path}`
+            : '/images/avatars/default.jpeg'
+        }
         onClickHandler={onYourProfileClick}
       />
       <MobileImageButton

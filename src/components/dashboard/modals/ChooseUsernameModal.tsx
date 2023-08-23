@@ -1,19 +1,17 @@
 'use client';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { FC, useEffect, useRef, useState } from 'react';
 import { Drawer } from 'vaul';
-
-import logger from '@/lib/logger';
 
 import Button from '@/components/buttons/Button';
 import { useSocial } from '@/components/context/SocialContext';
 
-import { Database } from '@/types/supabase';
+type ChooseUsernameModalProps = {
+  onDone?: () => void;
+};
 
-const FirstLoginModal: FC = () => {
+const ChooseUsernameModal: FC<ChooseUsernameModalProps> = ({ onDone }) => {
   const socialContext = useSocial();
 
-  const supabase = createClientComponentClient<Database>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [open, setOpen] = useState<boolean>(false);
@@ -32,26 +30,16 @@ const FirstLoginModal: FC = () => {
       setError('Username cannot be empty');
       return;
     }
+    const res = await socialContext?.setUsername(
+      usernameInputRef.current.value
+    );
 
-    const userId = socialContext?.userProfile?.userid;
-    const { error } = await supabase
-      .from('userprofile')
-      .update({
-        username: usernameInputRef.current?.value,
-        isDefaultUsername: false,
-      })
-      .eq('userid', userId);
-
-    if (error) {
-      setLoading(false);
-
-      logger(error, 'error updating username');
-      if (error.code === '23505') {
-        setError('Username already taken. Please choose another one.');
-        return;
-      }
+    if (!res?.success) {
+      setError(res?.errorMsg || 'Something went wrong');
+      return;
     } else {
       setOpen(false);
+      onDone?.();
     }
   };
 
@@ -97,4 +85,4 @@ const FirstLoginModal: FC = () => {
   );
 };
 
-export default FirstLoginModal;
+export default ChooseUsernameModal;

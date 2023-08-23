@@ -39,8 +39,13 @@ interface ISocial {
   friendRequests: UserProfile[];
   outgoingFriendRequests: string[];
   loading: boolean;
+  showProfilePictureModal: boolean;
   feed: Feed[] | null;
   levelXp: DBExperienceLevel[];
+  setUsername: (
+    username: string
+  ) => Promise<{ success: boolean; errorMsg?: string }>;
+  setShowProfilePictureModal: (value: boolean) => void;
   addFriend: (friendId: string) => Promise<FriendActionResponse>;
   addFriendByUsername: (username: string) => Promise<FriendActionResponse>;
   removeFriend: (friendId: string) => Promise<FriendActionResponse>;
@@ -100,6 +105,16 @@ interface SetOutgoingFriendRequestsAction {
   payload: string[];
 }
 
+interface SetShowProfilePictureModalAction {
+  type: 'SET_SHOW_PROFILE_PICTURE_MODAL';
+  payload: boolean;
+}
+
+interface SetUsernameAction {
+  type: 'SET_USERNAME';
+  payload: string;
+}
+
 type SocialAction =
   | SetOutgoingFriendRequestsAction
   | SetUserProfileAction
@@ -110,7 +125,9 @@ type SocialAction =
   | SetAddFriendAction
   | SetAddFriendRequestAction
   | SetDeleteFriendRequestAction
-  | SetFeedAction;
+  | SetFeedAction
+  | SetShowProfilePictureModalAction
+  | SetUsernameAction;
 
 // Define the initial state
 const initialSocial: ISocial = {
@@ -147,6 +164,13 @@ const initialSocial: ISocial = {
   levelXp: [],
   updateProfileIcon: async (_iconId: ProfileIcon) => {
     return false;
+  },
+  showProfilePictureModal: false,
+  setShowProfilePictureModal: (_value: boolean) => {
+    return;
+  },
+  setUsername: async (_username: string) => {
+    return { success: false, errorMsg: 'I am not a real Context :(' };
   },
 };
 
@@ -194,6 +218,17 @@ function SocialReducer(state: ISocial, action: SocialAction): ISocial {
       };
     case 'SET_FEED':
       return { ...state, feed: action.payload };
+    case 'SET_SHOW_PROFILE_PICTURE_MODAL':
+      return { ...state, showProfilePictureModal: action.payload };
+    case 'SET_USERNAME':
+      return {
+        ...state,
+        userProfile: {
+          ...(state.userProfile as UserProfile),
+          username: action.payload,
+        },
+      };
+
     default:
       return state;
   }
@@ -506,6 +541,41 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     return user;
   };
 
+  const setShowProfilePictureModal = (value: boolean) => {
+    dispatch({ type: 'SET_SHOW_PROFILE_PICTURE_MODAL', payload: value });
+  };
+
+  const setUsername = async (username: string) => {
+    if (!state.userProfile)
+      return { success: false, errorMsg: 'Something went wrong' };
+    dispatch({ type: 'SET_USERNAME', payload: username });
+
+    const userId = state.userProfile?.userid;
+    const { error } = await supabase
+      .from('userprofile')
+      .update({
+        username: username,
+        isDefaultUsername: false,
+      })
+      .eq('userid', userId);
+    if (error) {
+      logger(error);
+      if (error.code === '23505') {
+        return {
+          success: false,
+          errorMsg: 'Username already taken. Please choose another one.',
+        };
+      }
+      return {
+        success: false,
+        errorMsg: 'Something went wrong',
+      };
+    }
+    return {
+      success: true,
+    };
+  };
+
   const updateProfileIcon = async (icon: ProfileIcon) => {
     if (!state.userProfile || icon === undefined) return false;
     const newUserProfile = { ...state.userProfile, profile_icons: icon };
@@ -586,7 +656,9 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         declineFriendRequest,
         loadUserProfile,
         levelXp,
+        setUsername,
         updateProfileIcon,
+        setShowProfilePictureModal,
       }}
     >
       {children}

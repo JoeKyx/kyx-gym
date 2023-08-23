@@ -5,9 +5,9 @@ import { HTMLAttributes } from 'react';
 import { cn } from '@/lib';
 
 import GymCalendar from '@/components/dashboard/GymCalendar';
+import SelectProfilePictureModal from '@/components/dashboard/modals/SelectProfilePictureModal';
 import HistoryChart from '@/components/dashboard/profile/HistoryChart';
 import ProfileInfoCard from '@/components/dashboard/profile/ProfileInfoCard';
-import SelectProfilePictureModal from '@/components/dashboard/profile/SelectProfilePictureModal';
 
 type ProfileProps = HTMLAttributes<HTMLDivElement>;
 

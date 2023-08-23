@@ -37,8 +37,6 @@ type IProfile = {
   longestStreak: number;
   currentStreak: number;
   plannedWorkouts: DBCalendar[];
-  showProfilePictureModal: boolean;
-  setShowProfilePictureModal: (value: boolean) => void;
   muscleResolver: (muscleId: number) => string;
   updateWorkoutName: (
     name: string,
@@ -60,13 +58,9 @@ const initialProfile: IProfile = {
   isOwn: false,
   workouts: [],
   userProfile: null as unknown as UserProfile,
-  showProfilePictureModal: false,
   favoriteMuscle: null,
   longestStreak: 0,
   currentStreak: 0,
-  setShowProfilePictureModal: () => {
-    throw new Error('Using setShowProfilePictureModal out of Context');
-  },
   muscleResolver: () => '',
   updateWorkoutName: async () => {
     throw new Error('Using updateWorkoutName out of Context');
@@ -102,8 +96,6 @@ function ProfileReducer(state: IProfile, action: ProfileAction): IProfile {
       return { ...state, currentStreak: action.payload as number };
     case 'setPlannedWorkouts':
       return { ...state, plannedWorkouts: action.payload as DBCalendar[] };
-    case 'setShowProfilePictureModal':
-      return { ...state, showProfilePictureModal: action.payload as boolean };
     case 'changePlannedWorkout': {
       const newPlannedWorkouts = [...state.plannedWorkouts];
       const payload = action.payload as { id: number; plan: DBCalendar };
@@ -377,15 +369,10 @@ export function ProfileProvider({
     }
   };
 
-  const setShowProfilePictureModal = (value: boolean) => {
-    dispatch({ type: 'setShowProfilePictureModal', payload: value });
-  };
-
   return (
     <ProfileContext.Provider
       value={{
         ...state,
-        setShowProfilePictureModal,
         muscleResolver,
         updateWorkoutName,
         planWorkout,

@@ -156,8 +156,10 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
             {/* Profile Image */}
             <Image
               src={
-                profileContext?.userProfile?.icon
-                  ? `/images/avatars/${profileContext?.userProfile.profile_icons?.path}`
+                isOwn && socialContext?.userProfile?.profile_icons?.path
+                  ? `/images/avatars/${socialContext?.userProfile?.profile_icons?.path}`
+                  : profileContext?.userProfile?.icon
+                  ? `/images/avatars/${profileContext?.userProfile?.profile_icons?.path}`
                   : '/images/avatars/default.jpeg'
               }
               alt='Profile'
@@ -169,7 +171,7 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
             {isOwn && (
               <div
                 className='absolute inset-2 z-10 flex cursor-pointer items-center justify-center rounded-full bg-black opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-50'
-                onClick={() => profileContext.setShowProfilePictureModal(true)}
+                onClick={() => socialContext?.setShowProfilePictureModal(true)}
               >
                 <p className='font-semibold text-white'>Change</p>
               </div>

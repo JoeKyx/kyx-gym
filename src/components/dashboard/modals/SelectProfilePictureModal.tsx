@@ -7,7 +7,6 @@ import logger from '@/lib/logger';
 import { getAllAvailableIcons } from '@/lib/supabase-util';
 
 import Button from '@/components/buttons/Button';
-import { useProfile } from '@/components/context/ProfileContext';
 import { useSocial } from '@/components/context/SocialContext';
 import {
   TooltipContent,
@@ -20,7 +19,6 @@ import { ProfileIcon } from '@/types/UserProfile';
 const SelectProfilePictureModal: FC = () => {
   const socialContext = useSocial();
   const userLevel = socialContext?.userProfile?.level;
-  const profileContext = useProfile();
   const [icons, setIcons] = useState<ProfileIcon[]>([]);
   const [selectedIcon, setSelectedIcon] = useState<ProfileIcon | null>(null);
 
@@ -35,18 +33,18 @@ const SelectProfilePictureModal: FC = () => {
       setIcons(allIconsRes.data);
       const profileIcon =
         allIconsRes.data.find(
-          (icon) => icon.id === socialContext?.userProfile?.icon
+          (icon) => icon.id === socialContext?.userProfile?.profile_icons?.id
         ) || null;
       logger(allIconsRes.data, 'allIconsRes.data');
       logger(
-        socialContext?.userProfile?.icon,
+        socialContext?.userProfile?.profile_icons?.id,
         'socialContext?.userProfile?.icon'
       );
       logger(profileIcon, 'profileIcon');
       setSelectedIcon(profileIcon);
     };
     loadIcons();
-  }, [socialContext?.userProfile?.icon]);
+  }, [socialContext?.userProfile?.profile_icons?.id]);
 
   const handleIconSelection = (icon: ProfileIcon) => {
     if (!iconUnlocked(icon)) return;
@@ -57,7 +55,7 @@ const SelectProfilePictureModal: FC = () => {
   const onConfirm = async () => {
     if (!selectedIcon) return;
     logger(selectedIcon, 'selectedIcon');
-    profileContext.setShowProfilePictureModal(false);
+    socialContext?.setShowProfilePictureModal(false);
     await socialContext?.updateProfileIcon(selectedIcon);
   };
 
@@ -69,19 +67,19 @@ const SelectProfilePictureModal: FC = () => {
 
   const onOpenChangeHandler = (open: boolean) => {
     if (!open) {
-      profileContext.setShowProfilePictureModal(false);
+      socialContext?.setShowProfilePictureModal(false);
     }
   };
 
   return (
     <Drawer.Root
       dismissible={true}
-      open={profileContext.showProfilePictureModal}
+      open={socialContext?.showProfilePictureModal}
       onOpenChange={onOpenChangeHandler}
     >
       <Drawer.Portal>
         <Drawer.Overlay className='fixed inset-0 bg-black/40' />
-        <Drawer.Content className='fixed bottom-0 left-0 right-0 mt-24 flex flex-col rounded-t-[10px] bg-white'>
+        <Drawer.Content className='fixed bottom-0 left-0 right-0 mt-24 flex flex-col rounded-t-[10px] bg-zinc-100'>
           <div className='mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-zinc-300' />
 
           <div className='flex flex-col gap-4 space-y-4   p-4 md:flex-row md:justify-end md:space-y-0'>
@@ -104,7 +102,7 @@ const SelectProfilePictureModal: FC = () => {
                               : 'hover:bg-primary-400 cursor-pointer transition-all duration-300 ease-in-out'
                           } ${
                             selectedIcon?.id === icon.id
-                              ? 'border-primary-400'
+                              ? 'border-primary-400 bg-primary-300'
                               : 'border-transparent'
                           }`}
                           onClick={() => handleIconSelection(icon)}
