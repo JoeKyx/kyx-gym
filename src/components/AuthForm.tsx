@@ -1,8 +1,10 @@
 'use client';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Auth } from '@supabase/auth-ui-react';
-import { ThemeMinimal } from '@supabase/auth-ui-shared';
+import { ThemeSupa } from '@supabase/auth-ui-shared';
 import React from 'react';
+
+import { isProd } from '@/constant/env';
 
 export default function AuthForm() {
   const supabase = createClientComponentClient();
@@ -18,12 +20,16 @@ export default function AuthForm() {
     <Auth
       supabaseClient={supabase}
       view='sign_in'
-      appearance={{ theme: ThemeMinimal }}
+      appearance={{ theme: ThemeSupa }}
       theme='default'
       showLinks={true}
       socialLayout='horizontal'
       providers={['google']}
-      redirectTo='http://localhost:3000/auth/callback'
+      redirectTo={
+        isProd
+          ? process.env.NEXT_PUBLIC_DEPLOYMENT_URL_PROD + '/auth/callback'
+          : process.env.NEXT_PUBLIC_DEPLOYMENT_URL_DEV + '/auth/callback'
+      }
     />
   );
 }
