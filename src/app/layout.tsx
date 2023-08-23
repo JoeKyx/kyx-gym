@@ -1,10 +1,10 @@
+import { Analytics } from '@vercel/analytics/react';
 import { Metadata } from 'next';
 import * as React from 'react';
 
 import '@/styles/globals.css';
 
 import { siteConfig } from '@/constant/config';
-
 export const metadata: Metadata = {
   title: {
     default: siteConfig.title,
@@ -52,6 +52,7 @@ export default function RootLayout({
   return (
     <html>
       <body className='bg-indigo-100'>{children}</body>
+      <Analytics />
     </html>
   );
 }
