@@ -3,5 +3,5 @@ export const siteConfig = {
   description: 'Kyx Gym - Your workout partner',
   /** Without additional '/' on the end, e.g. https://theodorusclarence.com */
   // ! TODO: Change this to your domain
-  url: 'loalhost:3000',
+  url: 'https://kyx-gym-joekyx.vercel.app',
 };
