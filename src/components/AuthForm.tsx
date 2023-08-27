@@ -20,6 +20,8 @@ export default function AuthForm() {
 
   logger(isProd, 'isProd');
 
+  logger(window.location.origin);
+
   return (
     <Auth
       supabaseClient={supabase}

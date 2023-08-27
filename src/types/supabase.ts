@@ -231,7 +231,7 @@ export interface Database {
           targetuser: string | null;
           text: string | null;
           type: Database['public']['Enums']['profilefeedtype'] | null;
-          userid: string;
+          userid: string | null;
         };
         Insert: {
           date?: string;
@@ -240,7 +240,7 @@ export interface Database {
           targetuser?: string | null;
           text?: string | null;
           type?: Database['public']['Enums']['profilefeedtype'] | null;
-          userid: string;
+          userid?: string | null;
         };
         Update: {
           date?: string;
@@ -249,12 +249,18 @@ export interface Database {
           targetuser?: string | null;
           text?: string | null;
           type?: Database['public']['Enums']['profilefeedtype'] | null;
-          userid?: string;
+          userid?: string | null;
         };
         Relationships: [
           {
             foreignKeyName: 'feedprofile_targetuser_fkey';
             columns: ['targetuser'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          },
+          {
+            foreignKeyName: 'feedprofile_userid_fkey';
+            columns: ['userid'];
             referencedRelation: 'userprofile';
             referencedColumns: ['userid'];
           }
@@ -591,12 +597,6 @@ export interface Database {
             columns: ['main_muscle'];
             referencedRelation: 'muscles';
             referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'templates_userid_fkey';
-            columns: ['userid'];
-            referencedRelation: 'userprofile';
-            referencedColumns: ['userid'];
           }
         ];
       };

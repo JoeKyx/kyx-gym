@@ -10,15 +10,15 @@ type MobileImageButtonProps = HTMLAttributes<HTMLDivElement> &
         image: string;
         title: string;
         isLoading?: boolean;
-        isDisabled?: boolean; // Using "never" to indicate that "isDisabled" should not be available in this variant.
+        isDisabled?: boolean;
         onClickHandler: () => void;
       }
     | {
         image: string;
         title: string;
         isLoading?: boolean;
-        isDisabled: true; // Must be true if present
-        onClickHandler?: never; // Using "never" to indicate that "onClickHandler" should not be available in this variant.
+        isDisabled: true;
+        onClickHandler?: never;
       }
   );
 
@@ -34,15 +34,14 @@ const MobileImageButton: FC<MobileImageButtonProps> = forwardRef<
     isLoading,
     isDisabled,
     ...rest
-  } = props; // Extract isDisabled prop
+  } = props;
 
-  const [backgroundSize, setBackgroundSize] = useState('100%');
+  const [zoomedIn, setZoomedIn] = useState(false);
   const [opacity, setOpacity] = useState('opacity-50');
 
   const handleZoom = () => {
-    if (isDisabled) return; // 3. Make click handler inert if isDisabled is true
-
-    setBackgroundSize(backgroundSize === '100%' ? '120%' : '100%');
+    if (isDisabled) return;
+    setZoomedIn(!zoomedIn);
     setOpacity(opacity === 'opacity-50' ? 'opacity-0' : 'opacity-50');
     onClickHandler();
   };
@@ -52,34 +51,29 @@ const MobileImageButton: FC<MobileImageButtonProps> = forwardRef<
       ref={ref}
       {...rest}
       className={cn(
-        'relative flex h-1/3 flex-1 cursor-pointer items-center justify-center overflow-hidden rounded-md shadow-md transition-all duration-300 ease-in-out',
-        isDisabled ? 'cursor-not-allowed opacity-60' : '', // 2. Add styling when isDisabled is true
+        'relative flex h-1/3 flex-1 flex-col items-center justify-center overflow-hidden rounded-md bg-black shadow-md transition-all duration-300 ease-in-out',
+        isDisabled ? 'cursor-not-allowed bg-repeat opacity-60' : '',
         className
       )}
       style={{
         backgroundImage: `url(${image})`,
-        backgroundSize,
         backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: zoomedIn ? '120%' : '100%',
       }}
       onClick={handleZoom}
     >
-      <div className='z-10 mt-10 flex flex-col items-center justify-center'>
+      <div className='flex flex-col items-center justify-center'>
         <span className='text-xl font-bold text-white '>{title}</span>
 
         <Loader2
           className={cn(
-            'animate-spin text-white',
+            'animate-spin text-white transition-all',
             isLoading ? 'visible' : 'invisible'
           )}
           size={40}
         />
       </div>
-      <div
-        className={cn(
-          'absolute inset-0 bg-black transition-all duration-300 ease-in-out',
-          opacity
-        )}
-      ></div>
     </div>
   );
 });
