@@ -5,7 +5,7 @@
 module.exports = {
   // ! TODO: Change this to your domain
   /** Without additional '/' on the end, e.g. https://theodorusclarence.com */
-  siteUrl: 'https://kyx-gym-joekyx.vercel.app',
+  siteUrl: 'https://www.kyx-gym.app',
   generateRobotsTxt: true,
   robotsTxtOptions: {
     policies: [{ userAgent: '*', allow: '/' }],
