@@ -119,7 +119,7 @@ const ChallengesPage: FC<ChallengesPageProps> = forwardRef<
     : '/images/avatars/default.jpeg';
 
   return (
-    <main className={cn('mx-2', className)} ref={ref} {...rest}>
+    <main className={cn('md:mx-2', className)} ref={ref} {...rest}>
       <div className='flex w-full flex-col rounded-md bg-white p-4 shadow-md'>
         <PathNav
           paths={[

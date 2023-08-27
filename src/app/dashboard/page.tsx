@@ -1,8 +1,15 @@
+import { Metadata } from 'next';
 import { FC } from 'react';
 
 import Dashboard from '@/components/dashboard/Dashboard';
 import DashboardMobile from '@/components/dashboard/DashboardMobile';
 import MainNav from '@/components/navbar/MainNav';
+
+export const metadata: Metadata = {
+  title: 'Kyx Gym - Dashboard',
+  description:
+    'The dashboard for Kyx Gym. Letting users start workouts and track their progress.',
+};
 
 const page: FC = () => {
   return (

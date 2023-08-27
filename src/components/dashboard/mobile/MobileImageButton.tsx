@@ -10,7 +10,7 @@ type MobileImageButtonProps = HTMLAttributes<HTMLDivElement> &
         image: string;
         title: string;
         isLoading?: boolean;
-        isDisabled?: never; // Using "never" to indicate that "isDisabled" should not be available in this variant.
+        isDisabled?: boolean; // Using "never" to indicate that "isDisabled" should not be available in this variant.
         onClickHandler: () => void;
       }
     | {

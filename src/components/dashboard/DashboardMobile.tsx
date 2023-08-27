@@ -49,21 +49,21 @@ const DashboardMobile: FC<DashboardMobileProps> = forwardRef<
           aria-label='Menu'
         >
           <Tabs.Trigger
-            className='text-mauve11 hover:text-violet11 data-[state=active]:text-primary-500 flex h-[45px] flex-1 cursor-default select-none items-center justify-center gap-2 bg-white px-5 text-[15px] leading-none outline-none first:rounded-tl-md last:rounded-tr-md data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_2px] data-[state=active]:focus:shadow-black'
+            className='text-mauve11 hover:text-violet11 data-[state=active]:text-primary-500 flex h-[45px] flex-1 cursor-default select-none items-center justify-center gap-2 bg-white px-5 text-[15px] leading-none outline-none   data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_2px] data-[state=active]:focus:shadow-black'
             value='profile'
           >
             <User size={20} />
             <span>Profile</span>
           </Tabs.Trigger>
           <Tabs.Trigger
-            className='text-mauve11 hover:text-violet11 data-[state=active]:text-primary-500 flex h-[45px] flex-1 cursor-default select-none items-center justify-center gap-2 bg-white px-5 text-[15px] leading-none outline-none first:rounded-tl-md last:rounded-tr-md data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_2px] data-[state=active]:focus:shadow-black'
+            className='text-mauve11 hover:text-violet11 data-[state=active]:text-primary-500 flex h-[45px] flex-1 cursor-default select-none items-center justify-center gap-2 bg-white px-5 text-[15px] leading-none outline-none  data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_2px] data-[state=active]:focus:shadow-black'
             value='workouts'
           >
             <Dumbbell size={20} />
             <span>Workouts</span>
           </Tabs.Trigger>
           <Tabs.Trigger
-            className='text-mauve11 hover:text-violet11 data-[state=active]:text-primary-500 data-[state=active]:focus:shadow-primary-700 flex h-[45px] flex-1 cursor-default select-none items-center justify-center gap-2 bg-white px-5 text-[15px] leading-none outline-none first:rounded-tl-md last:rounded-tr-md data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_2px]'
+            className='text-mauve11 hover:text-violet11 data-[state=active]:text-primary-500 data-[state=active]:focus:shadow-primary-700 flex h-[45px] flex-1 cursor-default select-none items-center justify-center gap-2 bg-white px-5 text-[15px] leading-none outline-none   data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_2px]'
             value='social'
           >
             <Users size={20} />

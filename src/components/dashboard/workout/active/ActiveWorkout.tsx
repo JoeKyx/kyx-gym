@@ -216,7 +216,10 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
         {' '}
         {/* Add a specific height or max-height */}
         {workout.workout_items.map((item, index) => (
-          <div key={index} className='mb-4 rounded-lg bg-white p-4 shadow-md'>
+          <div
+            key={index}
+            className='mb-4 rounded-lg bg-white p-4 shadow-md md:p-4'
+          >
             <div className='flex items-center justify-between'>
               <div className='flex gap-2'>
                 <span className='text-primary-500 font-semibold'>

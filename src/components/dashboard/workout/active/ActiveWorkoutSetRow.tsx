@@ -149,14 +149,14 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
               type='text' // Change to text input
               inputMode='numeric' // Optimize keyboard for mobile devices
               pattern='[0-9]*' // Allow only digits
-              placeholder='Weight'
+              placeholder='KG'
               value={inputValues[set.id]?.weight || set.weight || ''}
               onChange={(e) => {
                 // Filter the value to include only digits
                 const value = e.target.value.replace(/[^0-9]/g, '');
                 handleInputChange(set, 'weight', Number(value));
               }}
-              className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
             />
             <input
@@ -170,7 +170,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
                 const value = e.target.value.replace(/[^0-9]/g, '');
                 handleInputChange(set, 'reps', Number(value));
               }}
-              className='focus:border-primary disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
             />
           </>
@@ -188,7 +188,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
                 const value = e.target.value.replace(/[^0-9]/g, '');
                 handleInputChange(set, 'speed', Number(value));
               }}
-              className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
             />
             <input
@@ -202,7 +202,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
                 const value = e.target.value.replace(/[^0-9]/g, '');
                 handleInputChange(set, 'distance', Number(value));
               }}
-              className='focus:border-primary disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
             />
           </>
@@ -220,7 +220,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
                 const value = e.target.value.replace(/[^0-9]/g, '');
                 handleInputChange(set, 'reps', Number(value));
               }}
-              className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
             />
           </>
@@ -233,14 +233,12 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
           onSetChange={(newType) => handleSetTypeChange(set, newType)}
         />
 
-        <div className='flex items-end justify-end'>
+        <div className='flex w-14 items-center'>
           {set.previous_set && workoutItem.exercises?.type === 'weight' && (
             <span className='text-start text-xs text-gray-500'>
               {set.previous_set.weight} KG x {set.previous_set.reps}
             </span>
           )}
-        </div>
-        <div className='items-center md:flex'>
           <RecordFlame
             isWeight={isHighestInWeight()}
             isVolume={isHighestInVolume()}

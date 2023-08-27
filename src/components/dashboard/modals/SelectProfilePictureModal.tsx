@@ -160,10 +160,10 @@ const SelectProfilePictureModal: FC = () => {
             </div>
 
             {selectedIcon && (
-              <div className='flex-1 flex-col justify-between md:mt-auto'>
-                {' '}
+              <div className='selected-icon-area flex flex-col md:mt-auto md:flex-1'>
+                <div className='my-4 h-[1px] w-2/3 self-center bg-gradient-to-r from-transparent via-black to-transparent md:hidden'></div>{' '}
                 {/* Add the md:mt-auto here */}
-                <div className='flex items-center space-x-4 pl-12 md:pl-0'>
+                <div className='flex w-full items-center justify-between space-x-4 px-6 md:justify-normal md:px-0 md:pl-0'>
                   <Image
                     src={`/images/avatars/${selectedIcon.path}`}
                     alt={selectedIcon.name}
@@ -171,14 +171,19 @@ const SelectProfilePictureModal: FC = () => {
                     height={102}
                     className='border-primary-500 rounded-full border-2'
                   />
-                  <div>
+                  <div className='flex flex-col'>
                     <div className='font-semibold text-black'>
                       {selectedIcon?.name}
                     </div>
                     <div>{selectedIcon?.description}</div>
+                    <div className='mt-2 flex items-end justify-end md:hidden'>
+                      <Button onClick={onConfirm}>
+                        Set as profile picture
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                <div className='flex items-end justify-end'>
+                <div className='mt-2 hidden items-end justify-end md:flex'>
                   <Button onClick={onConfirm}>Set as profile picture</Button>
                 </div>
               </div>
