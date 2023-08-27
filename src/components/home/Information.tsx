@@ -110,7 +110,7 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
             Focus on your training
           </animated.h2>
         </div>
-        <Button onClick={handleJoinNowClick} className='mb-20'>
+        <Button onClick={handleJoinNowClick} className='mb-10'>
           Join Now
         </Button>
       </div>
