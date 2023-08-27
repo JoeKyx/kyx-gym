@@ -19,14 +19,6 @@ export default function AuthForm() {
   if (!hydrated) return null;
 
   logger(isProd, 'isProd');
-  logger(
-    process.env.NEXT_PUBLIC_DEPLOYMENT_URL_PROD,
-    'process.env.NEXT_PUBLIC_DEPLOYMENT_URL_PROD'
-  );
-  logger(
-    process.env.NEXT_PUBLIC_DEPLOYMENT_URL_DEV,
-    'process.env.NEXT_PUBLIC_DEPLOYMENT_URL_DEV'
-  );
 
   return (
     <Auth
@@ -37,11 +29,7 @@ export default function AuthForm() {
       showLinks={true}
       socialLayout='horizontal'
       providers={['google']}
-      redirectTo={
-        isProd
-          ? process.env.NEXT_PUBLIC_DEPLOYMENT_URL_PROD + '/auth/callback'
-          : process.env.NEXT_PUBLIC_DEPLOYMENT_URL_DEV + '/auth/callback'
-      }
+      redirectTo={window.location.origin + '/auth/callback'}
     />
   );
 }
