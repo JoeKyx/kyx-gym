@@ -4,6 +4,8 @@ import * as React from 'react';
 
 import '@/styles/globals.css';
 
+import { Toaster } from '@/components/ui/toaster';
+
 import { siteConfig } from '@/constant/config';
 export const metadata: Metadata = {
   title: {
@@ -51,7 +53,12 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <body className='bg-indigo-100'>{children}</body>
+      <body className='bg-indigo-100'>
+        <main>
+          {children}
+          <Toaster />
+        </main>
+      </body>
       <Analytics />
     </html>
   );

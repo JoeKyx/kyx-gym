@@ -1,6 +1,7 @@
 import { FC, forwardRef } from 'react';
 import { HTMLAttributes } from 'react';
 
+import ChallengesButton from '@/components/dashboard/ChallengesButton';
 import FriendsArea from '@/components/dashboard/friends/FriendsArea';
 import YourProfileButton from '@/components/dashboard/NewProfileButton';
 import NewWorkoutButton from '@/components/dashboard/NewWorkoutButton';
@@ -21,6 +22,7 @@ const Dashboard: FC<DashboardProps> = forwardRef<
         <WorkoutFromTemplateButton />
 
         <YourProfileButton />
+        <ChallengesButton />
       </div>
       <FriendsArea className='flex h-full flex-col rounded-md border-white bg-white opacity-75 shadow-lg md:w-1/3' />
     </div>

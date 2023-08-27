@@ -352,8 +352,8 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     // Then, fetch the profiles of the requesters
     const requesterIds = friendRequests.map((fr) => fr.requesterid);
     const { data: requesterProfiles, error: rpError } = await supabase
-      .from('userprofile, profile_icons(*)')
-      .select('*')
+      .from('userprofile')
+      .select('*,  profile_icons(*)')
       .in('userid', requesterIds);
 
     if (rpError || !requesterProfiles) {
@@ -392,6 +392,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
       .then((values) => {
         const [userProfile, friendlist, friendRequestsSent, friendRequests] =
           values;
+        logger(userProfile, 'userProfile Fetched');
         dispatch({ type: 'SET_USER_PROFILE', payload: userProfile.data });
         dispatch({
           type: 'SET_FRIEND_REQUESTS',

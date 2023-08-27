@@ -39,7 +39,7 @@ const ActiveWorkoutArea: FC = () => {
         value='workout'
         className='radix-state-active:h-full flex max-h-screen flex-col overflow-hidden md:max-h-full'
       >
-        <ActiveWorkout className='mx-4 h-full px-4' />
+        <ActiveWorkout className='h-full px-4 md:mx-4' />
       </Tabs.Content>
       <Tabs.Content
         value='exercises'

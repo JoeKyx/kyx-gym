@@ -14,11 +14,17 @@ interface TypeDisplayProps {
   locked: boolean;
   set: DBSet;
   onSetChange?: (newType: DBSet['type']) => void;
+  className?: string;
 }
 
 type SetType = NonNullable<DBSet['type']>;
 
-const TypeDisplay: FC<TypeDisplayProps> = ({ locked, set, onSetChange }) => {
+const TypeDisplay: FC<TypeDisplayProps> = ({
+  locked,
+  set,
+  onSetChange,
+  className,
+}) => {
   const [showPopover, setShowPopover] = useState(false);
   const availableTypes: SetType[] = [
     'normal',
@@ -42,7 +48,7 @@ const TypeDisplay: FC<TypeDisplayProps> = ({ locked, set, onSetChange }) => {
   };
 
   return (
-    <div>
+    <div className={className}>
       <Popover open={showPopover && !locked}>
         <PopoverTrigger>
           <div

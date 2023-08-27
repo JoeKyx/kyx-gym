@@ -1,5 +1,5 @@
 import { FlameIcon } from 'lucide-react';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 import {
   Tooltip,
@@ -15,6 +15,8 @@ interface RecordFlameProps {
 }
 
 const RecordFlame: FC<RecordFlameProps> = ({ isWeight, isVolume, mode }) => {
+  const [open, setOpen] = useState(false);
+
   const getText = () => {
     if (isWeight && isVolume && mode === 'active')
       return 'You have set a new max Weight and Volume record for this exercise!';
@@ -34,8 +36,8 @@ const RecordFlame: FC<RecordFlameProps> = ({ isWeight, isVolume, mode }) => {
   if (!isWeight && !isVolume) return null;
   return (
     <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
+      <Tooltip open={open} onOpenChange={() => setOpen(!open)}>
+        <TooltipTrigger onClick={() => setOpen(!open)}>
           <FlameIcon className='fill-red-500 text-yellow-500' />
         </TooltipTrigger>
         <TooltipContent>{getText()}</TooltipContent>

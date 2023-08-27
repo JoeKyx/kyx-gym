@@ -26,6 +26,24 @@ const HistoryWorkoutItem: FC<HistoryWorkoutItemProps> = forwardRef<
     ?.map((muscle) => muscle.name)
     .join(', ');
 
+  const firstColumn = () => {
+    if (workoutItem.exercises?.type === 'weight') {
+      return 'Reps';
+    } else if (workoutItem.exercises?.type === 'speed') {
+      return 'Minutes';
+    } else {
+      return 'Reps';
+    }
+  };
+
+  const secondColumn = () => {
+    if (workoutItem.exercises?.type === 'weight') {
+      return 'Weight';
+    } else {
+      return 'Kilometers';
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -47,15 +65,30 @@ const HistoryWorkoutItem: FC<HistoryWorkoutItemProps> = forwardRef<
         <span className='text-sm text-gray-500'>{musclesUsed}</span>
       </div>
       <div className='flex flex-col pb-3'>
-        <div className='flex flex-row items-center gap-5'>
-          <span className='text-primary-600 w-12 font-semibold'>Set</span>
-          <span className='w-16 text-sm text-gray-500'>Reps</span>
-          <span className='w-16 text-sm text-gray-500'>Weight</span>
-          <span className='w-32 text-sm text-gray-500'>Type</span>
+        <div className='flex flex-row items-center '>
+          <span className='text-primary-600 w-16 text-left font-semibold'>
+            Sets
+          </span>
+          <span className='w-20 text-left text-sm text-gray-500'>
+            {firstColumn()}
+          </span>
+          {workoutItem.exercises?.type === 'weight' ||
+            (workoutItem.exercises?.type === 'speed' && (
+              <span className='w-20 text-left text-sm text-gray-500'>
+                {secondColumn()}
+              </span>
+            ))}
+          <span className='w-6 text-left text-sm text-gray-500 md:w-16'>
+            Type
+          </span>
         </div>
         {workoutItem.sets.map((set, index) => (
           <React.Fragment key={index}>
-            <HistoryWorkoutSet set={set} setNr={index + 1} />
+            <HistoryWorkoutSet
+              set={set}
+              setNr={index + 1}
+              exerciseType={workoutItem.exercises?.type || 'weight'}
+            />
           </React.Fragment>
         ))}
       </div>

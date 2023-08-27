@@ -37,7 +37,10 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const { className, ...rest } = props;
 
   const [inputValues, setInputValues] = useState<
-    Record<string, { weight?: number; reps?: number }>
+    Record<
+      string,
+      { weight?: number; reps?: number; distance?: number; speed?: number }
+    >
   >({});
   const [loadingAddSet, setLoadingAddSet] = useState<Record<number, boolean>>(
     {}
@@ -84,7 +87,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
 
   const handleInputChange = (
     set: Set,
-    field: 'weight' | 'reps',
+    field: 'weight' | 'reps' | 'speed' | 'distance',
     value: number
   ) => {
     const newValues = { ...inputValues[set.id], [field]: value };
@@ -94,8 +97,12 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const handleSetFinish = (set: Set) => {
     const weight = inputValues[set.id]?.weight ?? null;
     const reps = inputValues[set.id]?.reps ?? null;
+    const speed = inputValues[set.id]?.speed ?? null;
+    const distance = inputValues[set.id]?.distance ?? null;
     set.weight = weight !== undefined ? weight : null;
     set.reps = reps !== undefined ? reps : null;
+    set.speed = speed !== undefined ? speed : null;
+    set.distance = distance !== undefined ? distance : null;
     set.is_finished = !set.is_finished;
     // TODO: Play sound
     activeWorkoutContext.updateSet(set);
@@ -168,7 +175,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
 
   return (
     <div className={className} ref={ref} {...rest}>
-      <div className='my-5 rounded-lg bg-white p-4 shadow-md'>
+      <div className='my-3 rounded-lg bg-white p-4 shadow-md md:my-5 md:p-4'>
         <div className='flex'>
           <div className='flex w-full flex-col'>
             <PathNav

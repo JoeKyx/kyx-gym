@@ -26,7 +26,7 @@ const UserDisplay: FC<UserDisplayProps> = forwardRef<
       <Image
         src={
           userProfile.profile_icons
-            ? `/images/avatars/${userProfile.profile_icons}`
+            ? `/images/avatars/${userProfile.profile_icons.path}`
             : '/images/avatars/default.jpeg'
         }
         alt='Profile'

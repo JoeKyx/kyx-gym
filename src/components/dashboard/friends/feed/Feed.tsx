@@ -43,9 +43,13 @@ const Feed: FC<FeedProps> = forwardRef<HTMLDivElement, FeedProps>(
 
     return (
       <div className={className} ref={ref} {...props}>
-        {socialContext.feed.map((item) => {
-          return <FeedItemContainer key={item.id} feedItem={item} />;
-        })}
+        {socialContext.feed
+          .sort((a, b) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          })
+          .map((item) => {
+            return <FeedItemContainer key={item.id} feedItem={item} />;
+          })}
       </div>
     );
   }

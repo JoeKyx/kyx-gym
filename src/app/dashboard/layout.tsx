@@ -2,6 +2,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { ChallengeProvider } from '@/components/context/ChallengesContext';
 import { SocialProvider } from '@/components/context/SocialContext';
 import FirstLoginModal from '@/components/dashboard/modals/FirstLoginModal';
 
@@ -27,10 +28,12 @@ export default async function RootLayout({
 
   return (
     <SocialProvider>
-      <div className='flex flex-col md:h-screen md:max-h-screen'>
-        {children}
-        <FirstLoginModal />
-      </div>
+      <ChallengeProvider>
+        <div className='flex flex-col md:h-screen md:max-h-screen'>
+          {children}
+          <FirstLoginModal />
+        </div>
+      </ChallengeProvider>
     </SocialProvider>
   );
 }

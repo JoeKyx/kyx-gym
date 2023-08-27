@@ -29,6 +29,8 @@ export type DBInsertTemplateItem =
   Database['public']['Tables']['template_items']['Insert'];
 export type DBExperienceLevel =
   Database['public']['Tables']['experience_level']['Row'];
+export type DBExerciseType =
+  Database['public']['Tables']['exercises']['Row']['type'];
 
 export enum SetType {
   Normal = 'normal',

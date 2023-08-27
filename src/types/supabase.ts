@@ -52,6 +52,39 @@ export interface Database {
           }
         ];
       };
+      challenges: {
+        Row: {
+          available_from: string | null;
+          available_to: string | null;
+          created_at: string;
+          description: string | null;
+          hidden: boolean | null;
+          id: number;
+          name: string;
+          points: number | null;
+        };
+        Insert: {
+          available_from?: string | null;
+          available_to?: string | null;
+          created_at?: string;
+          description?: string | null;
+          hidden?: boolean | null;
+          id?: number;
+          name: string;
+          points?: number | null;
+        };
+        Update: {
+          available_from?: string | null;
+          available_to?: string | null;
+          created_at?: string;
+          description?: string | null;
+          hidden?: boolean | null;
+          id?: number;
+          name?: string;
+          points?: number | null;
+        };
+        Relationships: [];
+      };
       exercise_categories: {
         Row: {
           created_at: string | null;
@@ -107,6 +140,7 @@ export interface Database {
           id: number;
           name: string;
           public: boolean;
+          type: Database['public']['Enums']['exercise_type'];
           userid: string | null;
         };
         Insert: {
@@ -117,6 +151,7 @@ export interface Database {
           id?: number;
           name: string;
           public?: boolean;
+          type: Database['public']['Enums']['exercise_type'];
           userid?: string | null;
         };
         Update: {
@@ -127,6 +162,7 @@ export interface Database {
           id?: number;
           name?: string;
           public?: boolean;
+          type?: Database['public']['Enums']['exercise_type'];
           userid?: string | null;
         };
         Relationships: [
@@ -338,6 +374,7 @@ export interface Database {
           id: number;
           name: string;
           path: string;
+          required_challenge: number | null;
           required_level: number | null;
         };
         Insert: {
@@ -346,6 +383,7 @@ export interface Database {
           id?: number;
           name: string;
           path: string;
+          required_challenge?: number | null;
           required_level?: number | null;
         };
         Update: {
@@ -354,9 +392,17 @@ export interface Database {
           id?: number;
           name?: string;
           path?: string;
+          required_challenge?: number | null;
           required_level?: number | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'profile_icons_required_challenge_fkey';
+            columns: ['required_challenge'];
+            referencedRelation: 'challenges';
+            referencedColumns: ['id'];
+          }
+        ];
       };
       records: {
         Row: {
@@ -549,6 +595,37 @@ export interface Database {
           {
             foreignKeyName: 'templates_userid_fkey';
             columns: ['userid'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
+      user_challenges: {
+        Row: {
+          achieved_at: string;
+          challenge_id: number;
+          user_id: string;
+        };
+        Insert: {
+          achieved_at?: string;
+          challenge_id: number;
+          user_id: string;
+        };
+        Update: {
+          achieved_at?: string;
+          challenge_id?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'user_challenges_challenge_id_fkey';
+            columns: ['challenge_id'];
+            referencedRelation: 'challenges';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'user_challenges_user_id_fkey';
+            columns: ['user_id'];
             referencedRelation: 'userprofile';
             referencedColumns: ['userid'];
           }
@@ -757,11 +834,13 @@ export interface Database {
     };
     Enums: {
       date_type: 'workout';
+      exercise_type: 'weight' | 'speed' | 'other';
       profilefeedtype:
         | 'friendAdd'
         | 'friendRemove'
         | 'levelUp'
-        | 'finishedWorkout';
+        | 'finishedWorkout'
+        | 'challenge';
       recordtype: 'weight' | 'volume';
       set_type: 'normal' | 'drop' | 'warmup' | 'super' | 'insane';
       workout_status: 'active' | 'finished' | 'aborted' | 'deleted';

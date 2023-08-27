@@ -10,10 +10,17 @@ import { DBSet, Set, WorkoutItem } from '@/types/Workout';
 interface ActiveWorkoutSetRowProps {
   set: Set;
   setIndex: number;
-  inputValues: { [key: string]: { weight?: number; reps?: number } };
+  inputValues: {
+    [key: string]: {
+      weight?: number;
+      reps?: number;
+      speed?: number;
+      distance?: number;
+    };
+  };
   handleInputChange: (
     set: DBSet,
-    field: 'weight' | 'reps',
+    field: 'weight' | 'reps' | 'speed' | 'distance',
     value: number
   ) => void;
   handleSetTypeChange: (set: DBSet, type: DBSet['type']) => void;
@@ -126,51 +133,109 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
   return (
     <div className='mt-2 flex items-center justify-between gap-5'>
       <div className='flex items-center gap-3'>
-        <span className='text-primary-500 font-semibold'>{setIndex + 1}</span>
-        <input
-          type='text' // Change to text input
-          inputMode='numeric' // Optimize keyboard for mobile devices
-          pattern='[0-9]*' // Allow only digits
-          placeholder='Weight'
-          value={inputValues[set.id]?.weight || set.weight || ''}
-          onChange={(e) => {
-            // Filter the value to include only digits
-            const value = e.target.value.replace(/[^0-9]/g, '');
-            handleInputChange(set, 'weight', Number(value));
-          }}
-          className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-          disabled={set.is_finished}
-        />
-        <input
-          type='text' // Change to text input
-          inputMode='numeric' // Optimize keyboard for mobile devices
-          pattern='[0-9]*' // Allow only digits
-          placeholder='Reps'
-          value={inputValues[set.id]?.reps || set.reps || ''}
-          onChange={(e) => {
-            // Filter the value to include only digits
-            const value = e.target.value.replace(/[^0-9]/g, '');
-            handleInputChange(set, 'reps', Number(value));
-          }}
-          className='focus:border-primary disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-          disabled={set.is_finished}
-        />
+        <span className='text-primary-500 hidden font-semibold md:block'>
+          {setIndex + 1}
+        </span>
 
         <TypeDisplay
+          className='block md:hidden'
           locked={false}
           set={set}
           onSetChange={(newType) => handleSetTypeChange(set, newType)}
         />
-        <div
-          className='flex h-7 w-7 cursor-pointer items-center justify-center rounded-sm border border-black bg-red-600 p-2 text-white'
-          onClick={() => activeWorkoutContext.deleteSet(set.id)}
-        >
-          <span>X</span>
-        </div>
+        {workoutItem.exercises?.type === 'weight' && (
+          <>
+            <input
+              type='text' // Change to text input
+              inputMode='numeric' // Optimize keyboard for mobile devices
+              pattern='[0-9]*' // Allow only digits
+              placeholder='Weight'
+              value={inputValues[set.id]?.weight || set.weight || ''}
+              onChange={(e) => {
+                // Filter the value to include only digits
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                handleInputChange(set, 'weight', Number(value));
+              }}
+              className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              disabled={set.is_finished}
+            />
+            <input
+              type='text' // Change to text input
+              inputMode='numeric' // Optimize keyboard for mobile devices
+              pattern='[0-9]*' // Allow only digits
+              placeholder='Reps'
+              value={inputValues[set.id]?.reps || set.reps || ''}
+              onChange={(e) => {
+                // Filter the value to include only digits
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                handleInputChange(set, 'reps', Number(value));
+              }}
+              className='focus:border-primary disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              disabled={set.is_finished}
+            />
+          </>
+        )}
+        {workoutItem.exercises?.type === 'speed' && (
+          <>
+            <input
+              type='text' // Change to text input
+              inputMode='numeric' // Optimize keyboard for mobile devices
+              pattern='[0-9]*' // Allow only digits
+              placeholder='Minutes'
+              value={inputValues[set.id]?.speed || set.speed || ''}
+              onChange={(e) => {
+                // Filter the value to include only digits
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                handleInputChange(set, 'speed', Number(value));
+              }}
+              className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              disabled={set.is_finished}
+            />
+            <input
+              type='text' // Change to text input
+              inputMode='numeric' // Optimize keyboard for mobile devices
+              pattern='[0-9]*' // Allow only digits
+              placeholder='Kilometers'
+              value={inputValues[set.id]?.distance || set.distance || ''}
+              onChange={(e) => {
+                // Filter the value to include only digits
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                handleInputChange(set, 'distance', Number(value));
+              }}
+              className='focus:border-primary disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              disabled={set.is_finished}
+            />
+          </>
+        )}
+        {workoutItem.exercises?.type === 'other' && (
+          <>
+            <input
+              type='text' // Change to text input
+              inputMode='numeric' // Optimize keyboard for mobile devices
+              pattern='[0-9]*' // Allow only digits
+              placeholder='Reps'
+              value={inputValues[set.id]?.reps || set.reps || ''}
+              onChange={(e) => {
+                // Filter the value to include only digits
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                handleInputChange(set, 'reps', Number(value));
+              }}
+              className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              disabled={set.is_finished}
+            />
+          </>
+        )}
+
+        <TypeDisplay
+          className='hidden md:block'
+          locked={false}
+          set={set}
+          onSetChange={(newType) => handleSetTypeChange(set, newType)}
+        />
 
         <div className='flex items-end justify-end'>
-          {set.previous_set && (
-            <span className='text-end text-xs text-gray-500'>
+          {set.previous_set && workoutItem.exercises?.type === 'weight' && (
+            <span className='text-start text-xs text-gray-500'>
               {set.previous_set.weight} KG x {set.previous_set.reps}
             </span>
           )}
@@ -183,19 +248,28 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
           />
         </div>
       </div>
-
-      <div className='flex items-center'>
-        {set.is_finished ? (
-          <CheckSquare
-            className='text-primary-500 cursor-pointer'
-            onClick={() => handleSetFinish(set)}
-          />
-        ) : (
-          <Square
-            className='text-primary-500 cursor-pointer'
-            onClick={() => handleSetFinish(set)}
-          />
-        )}
+      <div className='flex items-center justify-between gap-2'>
+        <div className='flex items-center'>
+          {set.is_finished ? (
+            <CheckSquare
+              className='text-primary-500 cursor-pointer'
+              onClick={() => handleSetFinish(set)}
+              size={25}
+            />
+          ) : (
+            <Square
+              className='text-primary-500 cursor-pointer'
+              onClick={() => handleSetFinish(set)}
+              size={25}
+            />
+          )}
+        </div>
+        <div
+          className='flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm border border-black bg-red-600 p-2 text-white'
+          onClick={() => activeWorkoutContext.deleteSet(set.id)}
+        >
+          <span>X</span>
+        </div>
       </div>
     </div>
   );

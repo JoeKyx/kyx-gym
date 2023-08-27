@@ -379,6 +379,8 @@ export const updateSetInDB = async (
   const updateSet: UpdateSet = {
     weight: update.weight,
     reps: update.reps,
+    distance: update.distance,
+    speed: update.speed,
     is_finished: update.is_finished,
     workout_item_id: update.workout_item_id,
     workout_id: update.workout_id,
@@ -936,10 +938,62 @@ export const loadLevelXp = async () => {
 };
 
 export const getAllAvailableIcons = async () => {
-  const { data, error } = await supabase.from('profile_icons').select('*');
+  const { data, error } = await supabase
+    .from('profile_icons')
+    .select('*, challenges(hidden)');
   if (error || !data) {
     logger(error || 'No data');
     return { success: false, error: error?.message || 'Error loading icons' };
+  }
+  return { success: true, data };
+};
+
+export const hasActiveWorkout = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('workouts')
+    .select('id, name')
+    .eq('userid', userId)
+    .eq('status', 'active')
+    .limit(1)
+    .single();
+  logger(data, 'data');
+  if (error || !data) {
+    logger(error || 'No data');
+    return {
+      success: false,
+      error: error?.message || 'Error loading workouts',
+    };
+  }
+  return { success: true, data };
+};
+
+export const deleteWorkout = async (workoutId: number) => {
+  const { data, error } = await supabase
+    .from('workouts')
+    .delete()
+    .eq('id', workoutId);
+  if (error || !data) {
+    logger(error || 'No data');
+    return {
+      success: false,
+      error: error?.message || 'Error deleting workout',
+    };
+  }
+  return { success: true, data };
+};
+
+export const deleteAllActiveWorkouts = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('workouts')
+    .delete()
+    .eq('userid', userId)
+    .eq('status', 'active');
+  if (error || !data) {
+    logger(error || 'No data');
+    return {
+      success: false,
+      error: error?.message || 'Error deleting workout',
+    };
   }
   return { success: true, data };
 };

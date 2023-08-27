@@ -9,14 +9,19 @@ import {
   TooltipTrigger,
 } from '@/components/ui/Tooltip';
 
-import { HistorySet } from '@/types/Workout';
+import { DBExerciseType, HistorySet } from '@/types/Workout';
 
 type HistoryWorkoutSetProps = {
   set: HistorySet;
   setNr: number;
+  exerciseType: DBExerciseType;
 };
 
-const HistoryWorkoutSet: FC<HistoryWorkoutSetProps> = ({ set, setNr }) => {
+const HistoryWorkoutSet: FC<HistoryWorkoutSetProps> = ({
+  set,
+  setNr,
+  exerciseType,
+}) => {
   const isWeightRecord = () => {
     // Does the records of the set contain a weight record?
     return set.records.some((record) => record.type === 'weight');
@@ -33,11 +38,24 @@ const HistoryWorkoutSet: FC<HistoryWorkoutSetProps> = ({ set, setNr }) => {
   };
 
   return (
-    <div className='flex flex-row items-center gap-5'>
-      <span className='text-primary-600 w-12 font-semibold'>{setNr}</span>
-      <span className='w-16 text-sm text-gray-500'>{set.reps} reps</span>
-      <span className='w-16 text-sm text-gray-500'>{set.weight} kg</span>
-      <div className='w-8 md:w-16'>
+    <div className='flex flex-row items-start '>
+      <span className='text-primary-600 w-16 text-left font-semibold'>
+        {setNr}
+      </span>
+      <span className='w-20 text-left text-sm text-gray-500'>
+        {exerciseType === 'speed' ? `${set.speed} min` : `${set.reps} Reps`}
+      </span>
+      {exerciseType === 'weight' && (
+        <span className='w-20 text-left text-sm text-gray-500'>
+          {set.weight} kg
+        </span>
+      )}
+      {exerciseType === 'speed' && (
+        <span className='w-20 text-left text-sm text-gray-500'>
+          {set.distance} km
+        </span>
+      )}
+      <div className='w-6 md:w-16'>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>

@@ -94,7 +94,7 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
           {/* Centered image */}
           <div
             className='relative flex items-center justify-center'
-            style={{ width: '117px', height: '117px' }}
+            style={{ width: '125px', height: '125px' }}
           >
             {' '}
             {/* Container to position the image and SVG */}
@@ -163,14 +163,14 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
                   : '/images/avatars/default.jpeg'
               }
               alt='Profile'
-              width={96}
-              height={96}
-              className='absolute rounded-full'
+              width={125}
+              height={125}
+              className='rounded-full'
             />
             {/* Overlay */}
             {isOwn && (
               <div
-                className='absolute inset-2 z-10 flex cursor-pointer items-center justify-center rounded-full bg-black opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-50'
+                className='absolute inset-1 z-10 flex cursor-pointer items-center justify-center rounded-full bg-black opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-50'
                 onClick={() => socialContext?.setShowProfilePictureModal(true)}
               >
                 <p className='font-semibold text-white'>Change</p>
@@ -192,13 +192,22 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
               </p>
             )}
           </div>
-          <ButtonLink
-            className='hidden md:block'
-            variant='light'
-            href={`/dashboard/profile/${profileContext?.userProfile.username}/history/`}
-          >
-            See all Workouts
-          </ButtonLink>
+          <div className='flex flex-col gap-2'>
+            <ButtonLink
+              className='hidden md:block'
+              variant='primary'
+              href={`/dashboard/profile/${profileContext?.userProfile.username}/history/`}
+            >
+              See all Workouts
+            </ButtonLink>
+            <ButtonLink
+              className='hidden md:block'
+              variant='primary'
+              href={`/dashboard/profile/${profileContext?.userProfile.username}/challenges/`}
+            >
+              Completed Challenges
+            </ButtonLink>
+          </div>
         </div>
       </div>
       <div className='hidden items-start md:flex  md:flex-grow  md:flex-col md:items-center md:justify-center'>
@@ -214,18 +223,15 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
           </p>
         )}
       </div>
-      <div className='mb-6 flex w-full justify-between px-6'>
+      <div className='mb-6 mt-2 flex w-full justify-between px-6'>
         {' '}
-        {/* <-- Removed flex-grow from here */}
         <div className='flex flex-grow flex-col justify-end text-center'>
           {' '}
-          {/* <-- Add flex-grow, flex and flex-col here, and justify-end to align text to the bottom */}
           <p className='font-semibold'>Favorite Muscle</p>
           <p>{profileContext.favoriteMuscle?.name}</p>
         </div>
         <div className='flex flex-grow flex-col justify-end text-center'>
           {' '}
-          {/* <-- Same here */}
           <p className='font-semibold'>Level</p>
           <p>{profileContext?.userProfile.level}</p>
         </div>
@@ -242,16 +248,22 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
           <p>{profileContext.longestStreak} days</p>
         </div>
       </div>
-      <div className='flex justify-between gap-2  md:hidden'>
+      <div className='flex gap-2  md:hidden'>
         <AddFriendButton
           userId={profileContext?.userProfile.userid}
           _friendName={profileContext?.userProfile.username}
         />
         <ButtonLink
-          variant='light'
+          variant='primary'
           href={`/dashboard/profile/${profileContext?.userProfile.username}/history/`}
         >
           See all Workouts
+        </ButtonLink>
+        <ButtonLink
+          variant='primary'
+          href={`/dashboard/profile/${profileContext?.userProfile.username}/challenges/`}
+        >
+          Completed Challenges
         </ButtonLink>
       </div>
     </div>

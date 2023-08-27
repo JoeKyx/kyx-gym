@@ -6,6 +6,21 @@ import { cn } from '@/lib/utils';
 import Button from '@/components/buttons/Button';
 import { useActiveWorkout } from '@/components/context/ActiveWorkoutContext';
 import AddNewExerciseModal from '@/components/dashboard/workout/active/AddNewExerciseModal';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/Dropdown';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 
 import { Exercise } from '@/types/Workout';
 
@@ -80,7 +95,7 @@ const AddExercises: FC<AddExercisesProps> = forwardRef<
       ref={ref}
       {...rest}
     >
-      <div className='mx-4 flex justify-between'>
+      <div className='mx-1 flex max-h-12 justify-between'>
         <Button onClick={() => setShowAddNewExerciseModal(true)}>
           Create New Exercise
         </Button>
@@ -119,57 +134,62 @@ const AddExercises: FC<AddExercisesProps> = forwardRef<
       />
       <div className='flex flex-col '>
         <span className='px-2 font-semibold'>Category:</span>
-        <div className='flex flex-wrap'>
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => {
-                if (selectedCategory === category.id) {
-                  setSelectedCategory(null);
-                } else {
-                  setSelectedCategory(category.id);
-                }
-              }}
-              className={cn(
-                'border-primary-500 m-1 cursor-pointer rounded-md border bg-slate-50 px-2 py-1 transition-all duration-300 ease-in-out',
-                {
-                  'bg-primary-600 text-white': category.id === selectedCategory,
-                }
-              )}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
+        <Select
+          onValueChange={(e) =>
+            e == 'All' ? setSelectedCategory(null) : setSelectedCategory(+e)
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder='Select a category to filter' />
+          </SelectTrigger>
+          <SelectContent className='SelectContent rounded-md rounded-b-none bg-slate-200'>
+            <SelectItem value='All' key='All'>
+              All
+            </SelectItem>
+            {categories.map((category) => (
+              <SelectItem value={category.id.toString()} key={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className='flex flex-col '>
         <span className='px-2 font-semibold'>Muscles:</span>
-        <div className='flex flex-wrap'>
-          {muscles.map((muscle) => (
-            <button
-              key={muscle.id}
-              onClick={() => {
-                if (selectedMuscles.includes(muscle.id)) {
-                  setSelectedMuscles(
-                    selectedMuscles.filter((m) => m !== muscle.id)
-                  );
-                } else {
-                  setSelectedMuscles([...selectedMuscles, muscle.id]);
-                }
-              }}
-              className={cn(
-                'border-primary-500 m-1 cursor-pointer rounded-md border bg-slate-50 px-2 py-1 transition-all duration-300 ease-in-out',
-                {
-                  'bg-primary-600 text-white': selectedMuscles.includes(
-                    muscle.id
-                  ),
-                }
-              )}
-            >
-              {muscle.name}
-            </button>
-          ))}
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='light'>
+              {selectedMuscles.length
+                ? selectedMuscles
+                    .map(
+                      (muscleId) =>
+                        muscles.find((muscle) => muscle.id === muscleId)?.name
+                    )
+                    .join(', ')
+                : 'Select Muscles to filter'}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Muscles</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              {muscles.map((muscle) => (
+                <DropdownMenuCheckboxItem
+                  checked={selectedMuscles.includes(muscle.id)}
+                  onCheckedChange={() =>
+                    setSelectedMuscles((prev) =>
+                      prev.includes(muscle.id)
+                        ? prev.filter((id) => id !== muscle.id)
+                        : [...prev, muscle.id]
+                    )
+                  }
+                  key={muscle.id}
+                >
+                  {muscle.name}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className='flex max-h-screen flex-col gap-2 overflow-auto bg-slate-200'>

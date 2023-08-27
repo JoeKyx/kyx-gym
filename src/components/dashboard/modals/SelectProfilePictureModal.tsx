@@ -1,12 +1,13 @@
 import { Tooltip } from '@radix-ui/react-tooltip';
 import Image from 'next/image';
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Drawer } from 'vaul';
 
 import logger from '@/lib/logger';
 import { getAllAvailableIcons } from '@/lib/supabase-util';
 
 import Button from '@/components/buttons/Button';
+import { useChallenges } from '@/components/context/ChallengesContext';
 import { useSocial } from '@/components/context/SocialContext';
 import {
   TooltipContent,
@@ -18,33 +19,53 @@ import { ProfileIcon } from '@/types/UserProfile';
 
 const SelectProfilePictureModal: FC = () => {
   const socialContext = useSocial();
+  const challengeContext = useChallenges();
   const userLevel = socialContext?.userProfile?.level;
   const [icons, setIcons] = useState<ProfileIcon[]>([]);
   const [selectedIcon, setSelectedIcon] = useState<ProfileIcon | null>(null);
 
+  const iconUnlocked = useCallback(
+    (icon: ProfileIcon) => {
+      if (icon.required_level && userLevel && icon.required_level > userLevel) {
+        return false;
+      }
+      if (
+        icon.required_challenge &&
+        !challengeContext?.userCompletedChallenges.find(
+          (challenge) => challenge.id === icon.required_challenge
+        )
+      ) {
+        return false;
+      }
+      return true;
+    },
+    [challengeContext?.userCompletedChallenges, userLevel]
+  );
+
   useEffect(() => {
     const loadIcons = async () => {
       const allIconsRes = await getAllAvailableIcons();
+      logger(allIconsRes, 'allIconsRes');
       if (!allIconsRes.success) {
         logger(allIconsRes.error, 'loadIcons');
         return;
       }
       if (!allIconsRes.data) return;
-      setIcons(allIconsRes.data);
+      // Filter out the icons that are not unlocked
+      const unlockedIcons = allIconsRes.data.filter((icon) =>
+        iconUnlocked(icon)
+      );
+      setIcons(unlockedIcons);
       const profileIcon =
         allIconsRes.data.find(
           (icon) => icon.id === socialContext?.userProfile?.profile_icons?.id
         ) || null;
-      logger(allIconsRes.data, 'allIconsRes.data');
-      logger(
-        socialContext?.userProfile?.profile_icons?.id,
-        'socialContext?.userProfile?.icon'
-      );
+
       logger(profileIcon, 'profileIcon');
       setSelectedIcon(profileIcon);
     };
     loadIcons();
-  }, [socialContext?.userProfile?.profile_icons?.id]);
+  }, [iconUnlocked, socialContext?.userProfile?.profile_icons?.id]);
 
   const handleIconSelection = (icon: ProfileIcon) => {
     if (!iconUnlocked(icon)) return;
@@ -54,15 +75,8 @@ const SelectProfilePictureModal: FC = () => {
 
   const onConfirm = async () => {
     if (!selectedIcon) return;
-    logger(selectedIcon, 'selectedIcon');
     socialContext?.setShowProfilePictureModal(false);
     await socialContext?.updateProfileIcon(selectedIcon);
-  };
-
-  const iconUnlocked = (icon: ProfileIcon) => {
-    if (icon.required_level && userLevel && icon.required_level > userLevel)
-      return false;
-    return true;
   };
 
   const onOpenChangeHandler = (open: boolean) => {
@@ -87,6 +101,10 @@ const SelectProfilePictureModal: FC = () => {
               <Drawer.Title className='mb-4 text-center font-medium md:text-left'>
                 Choose your profile icon
               </Drawer.Title>
+              <span className='mb-2 text-center'>
+                You can unlock more icons by leveling up and completing
+                challenges
+              </span>
               <div className='grid grid-cols-3 gap-4 md:grid-cols-5 lg:grid-cols-8'>
                 {icons.map((icon) => (
                   <TooltipProvider key={icon.id}>
@@ -95,9 +113,7 @@ const SelectProfilePictureModal: FC = () => {
                         <button
                           key={icon.id}
                           className={`rounded-md border p-2 ${
-                            icon.required_level &&
-                            userLevel &&
-                            icon.required_level > userLevel
+                            !iconUnlocked(icon)
                               ? 'cursor-not-allowed opacity-50'
                               : 'hover:bg-primary-400 cursor-pointer transition-all duration-300 ease-in-out'
                           } ${
@@ -118,9 +134,23 @@ const SelectProfilePictureModal: FC = () => {
                       </TooltipTrigger>
                       {!iconUnlocked(icon) && (
                         <TooltipContent>
-                          <p className='text-center'>
-                            Level {icon.required_level} required
-                          </p>
+                          {icon.required_challenge && (
+                            <p className='text-center'>
+                              Complete the Challenge:{' '}
+                              {
+                                challengeContext?.availableChallenges.find(
+                                  (challenge) =>
+                                    challenge.id === icon.required_challenge
+                                )?.name
+                              }{' '}
+                              to unlock this icon
+                            </p>
+                          )}
+                          {icon.required_level && icon.required_level > 0 ? (
+                            <p className='text-center'>
+                              Level {icon.required_level} required
+                            </p>
+                          ) : null}
                         </TooltipContent>
                       )}
                     </Tooltip>
