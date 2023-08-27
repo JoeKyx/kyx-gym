@@ -2,7 +2,6 @@ import React, { FC, forwardRef, HTMLAttributes } from 'react';
 
 import ProfileIcon from '@/components/dashboard/ProfileIcon';
 import Username from '@/components/dashboard/Username';
-import PrimaryLink from '@/components/links/PrimaryLink';
 
 type MainNavProps = HTMLAttributes<HTMLDivElement>;
 
@@ -17,13 +16,6 @@ const MainNav: FC<MainNavProps> = forwardRef<HTMLDivElement, MainNavProps>(
               Welcome <Username className='font-semibold' />!
             </span>
           </div>
-          <div>
-            <PrimaryLink href='/dashboard'>Home</PrimaryLink>
-          </div>
-          <div>
-            <PrimaryLink href='/about'>About</PrimaryLink>
-          </div>
-          {/* Add more links as necessary */}
         </nav>
       </div>
     );
