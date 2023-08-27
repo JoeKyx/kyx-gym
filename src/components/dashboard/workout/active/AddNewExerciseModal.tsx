@@ -37,7 +37,12 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 
-import { DBCategory, DBExercise, DBMuscle } from '@/types/Workout';
+import {
+  DBCategory,
+  DBExercise,
+  DBInsertExercise,
+  DBMuscle,
+} from '@/types/Workout';
 
 const formSchema = z.object({
   name: z.string().nonempty(),
@@ -125,8 +130,9 @@ const AddNewExerciseModal: FC<AddNewExerciseModalProps> = ({
       setLoading(false);
       return;
     }
-    const exercise = {
+    const exercise: DBInsertExercise = {
       name: values.name,
+      type: 'weight',
       description: values.description,
       categoryid: values.category,
       userid: socialContext?.userProfile?.userid,
