@@ -85,66 +85,69 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
   };
 
   return (
-    <div className='relative h-full bg-black'>
-      <div className='flex flex-col items-center'>
-        <Image
-          src='/images/bg/ancient_ninja_gym.jpeg'
-          layout='fill'
-          objectFit='cover'
-          alt='Background Image'
-          className='z-0 opacity-60'
-        />
-        <animated.h2
-          style={springs}
-          ref={ref}
-          className='mb-4 mt-20 text-4xl font-bold text-white drop-shadow-md filter'
-        >
-          Find Your Inner Ninja
-        </animated.h2>
-        <animated.h2
-          style={springs}
-          className='text-2xl font-semibold text-white drop-shadow-md filter'
-        >
-          Focus on your training
-        </animated.h2>
+    <div className='relative h-full bg-black bg-opacity-60'>
+      <Image
+        src='/images/bg/ancient_ninja_gym.jpeg'
+        layout='fill'
+        objectFit='cover'
+        alt='Background Image'
+        className='-z-20'
+      />
 
-        {transitions(
-          (style, item) =>
-            item && (
-              <animated.div
-                style={{ ...style, top: '18%', ...springs2 }}
-                ref={ref2}
-                className='absolute flex w-full flex-col items-center'
-              >
-                <Image
-                  src={item.src}
-                  width={300}
-                  height={600}
-                  alt='App Screenshot'
-                />
-                <div className='mt-4 text-white'>
-                  <h2 className='text-xl font-semibold'>{item.title}</h2>
-                </div>
-              </animated.div>
-            )
-        )}
-
-        <button
-          onClick={prev}
-          className='absolute left-0 top-1/2 -translate-y-2/4 transform text-4xl text-white'
-        >
-          &larr;
-        </button>
-        <button
-          onClick={next}
-          className='absolute right-0 top-1/2 -translate-y-2/4 transform text-4xl text-white'
-        >
-          &rarr;
-        </button>
-        <Button onClick={handleJoinNowClick} className='absolute bottom-12'>
+      <div className='flex h-full flex-col items-center justify-between'>
+        <div className='flex flex-col items-center justify-center'>
+          <animated.h2
+            style={springs}
+            ref={ref}
+            className='mb-4 mt-10 text-center text-4xl font-bold text-white drop-shadow-md filter'
+          >
+            Find Your Inner Ninja
+          </animated.h2>
+          <animated.h2
+            style={springs}
+            className='text-2xl font-semibold text-white drop-shadow-md filter'
+          >
+            Focus on your training
+          </animated.h2>
+        </div>
+        <Button onClick={handleJoinNowClick} className='mb-20'>
           Join Now
         </Button>
       </div>
+
+      {transitions(
+        (style, item) =>
+          item && (
+            <animated.div
+              style={{ ...style, top: '18%', ...springs2 }}
+              ref={ref2}
+              className='absolute flex w-full flex-col items-center'
+            >
+              <Image
+                src={item.src}
+                width={250}
+                height={500}
+                alt='App Screenshot'
+              />
+              <div className='mt-4 text-white'>
+                <h2 className='text-xl font-semibold'>{item.title}</h2>
+              </div>
+            </animated.div>
+          )
+      )}
+
+      <button
+        onClick={prev}
+        className='absolute left-0 top-1/2 -translate-y-2/4 transform text-4xl text-white'
+      >
+        &larr;
+      </button>
+      <button
+        onClick={next}
+        className='absolute right-0 top-1/2 -translate-y-2/4 transform text-4xl text-white'
+      >
+        &rarr;
+      </button>
     </div>
   );
 };
