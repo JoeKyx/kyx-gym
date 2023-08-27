@@ -28,7 +28,7 @@ enabled = true
 # Port to use for Supabase Studio.
 port = 54323
 # External URL of the API server that frontend connects to.
-api_url = "https://kyx-gym-joekyx.vercel.app"
+api_url = "https://www.kyx-gym.app"
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
@@ -49,7 +49,7 @@ file_size_limit = "50MiB"
 # in emails.
 site_url = "https://www.kyx-gym.app/"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://localhost:3000", "https://kyx-gym-joekyx.vercel.app/"]
+additional_redirect_urls = ["https://localhost:3000", "https://www.kyx-gym.app/"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # If disabled, the refresh token will never expire.
