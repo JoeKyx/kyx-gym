@@ -1,9 +1,10 @@
 'use client';
-import { Loader2Icon } from 'lucide-react';
+import { Loader2Icon, Save } from 'lucide-react';
 import { FC, useEffect, useState } from 'react';
 
 import { loadTemplatesFromDB } from '@/lib/supabase-util';
 
+import IconButton from '@/components/buttons/IconButton';
 import { useSocial } from '@/components/context/SocialContext';
 import TemplateContainer from '@/components/dashboard/templates/TemplateContainer';
 import PathNav from '@/components/navbar/PathNav';
@@ -36,13 +37,33 @@ const Templates: FC = () => {
   }, [userId]);
 
   return (
-    <div className='mx-10 mt-4 flex flex-col gap-4'>
-      <PathNav
-        paths={[
-          { name: 'Dashboard', href: '/dashboard' },
-          { name: 'Templates' },
-        ]}
-      />
+    <div className='mt-4 flex flex-col gap-4 md:mx-10'>
+      <div className='flex w-full flex-col bg-white p-4 shadow-md'>
+        <PathNav
+          paths={[
+            { name: 'Dashboard', href: '/dashboard' },
+            { name: 'Templates' },
+          ]}
+        />
+        <h1 className='mt-4 text-2xl font-bold'>Templates</h1>
+        <div className='flex flex-col gap-2'>
+          <p className='text-sm'>
+            Templates are workouts that you can use to create a new workout.
+            They are useful for creating workouts that you do often.
+          </p>
+          <div className='flex items-center gap-2'>
+            <IconButton
+              variant='outline'
+              className='mx-4 h-3 w-3 rounded-full'
+              icon={Save}
+            />
+            <span>
+              To save a workout as a template, click the "Save as Template"
+              button after you have finished a workout.
+            </span>
+          </div>
+        </div>
+      </div>
 
       {loading && (
         <Loader2Icon

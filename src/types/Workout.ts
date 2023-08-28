@@ -1,4 +1,5 @@
 import { Database } from '@/types/supabase';
+import { UserProfile } from '@/types/UserProfile';
 
 export type DBWorkout = Database['public']['Tables']['workouts']['Row'];
 export type DBUpdateWorkout =
@@ -73,6 +74,8 @@ export type HistorySet = DBSet & {
 
 export type Template = DBTemplate & {
   main_muscle_filled: DBMuscle | null;
+  template_items: TemplateItem[];
+  owner: UserProfile | null;
 };
 
 export type TemplateItem = DBTemplateItem & {

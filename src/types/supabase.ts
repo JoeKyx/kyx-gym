@@ -257,12 +257,6 @@ export interface Database {
             columns: ['targetuser'];
             referencedRelation: 'userprofile';
             referencedColumns: ['userid'];
-          },
-          {
-            foreignKeyName: 'feedprofile_userid_fkey';
-            columns: ['userid'];
-            referencedRelation: 'userprofile';
-            referencedColumns: ['userid'];
           }
         ];
       };
@@ -597,6 +591,12 @@ export interface Database {
             columns: ['main_muscle'];
             referencedRelation: 'muscles';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'templates_userid_fkey';
+            columns: ['userid'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
           }
         ];
       };
@@ -775,6 +775,12 @@ export interface Database {
             columns: ['template_id'];
             referencedRelation: 'templates';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'workouts_userid_fkey';
+            columns: ['userid'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
           }
         ];
       };

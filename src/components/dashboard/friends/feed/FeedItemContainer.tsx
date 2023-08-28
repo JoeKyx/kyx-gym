@@ -80,12 +80,14 @@ const FeedItemContainer: FC<FeedItemProps> = ({ feedItem }) => {
   }
 
   return (
-    <div className='border-primary-500 hover:bg-primary-200 flex w-full  border-t py-2 transition-colors duration-200 ease-in-out'>
-      <AvatarDisplay
-        imageUrl={avatar}
-        alt={`Avatar of ${friend?.username} || 'a user'`}
-        className='mx-3'
-      />
+    <div className='border-primary-500 hover:bg-primary-200 flex w-full justify-start border-t py-2 transition-colors duration-200 ease-in-out'>
+      <div className='mx-2'>
+        <AvatarDisplay
+          imageUrl={avatar}
+          alt={`Avatar of ${friend?.username} || 'a user'`}
+          className='h-10 w-10 rounded-full'
+        />
+      </div>
       <div className='flex flex-col items-start'>
         <TextComponent />
         <span className='text-xs'>{timeAgo}</span>

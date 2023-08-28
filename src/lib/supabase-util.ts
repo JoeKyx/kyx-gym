@@ -727,8 +727,10 @@ export const loadTemplatesFromDB = async () => {
   const userId = user.data.user?.id;
   const { data, error } = await supabase
     .from('templates')
-    .select('*, main_muscle_filled: muscles(*)')
-    .eq('userid', userId);
+    .select(
+      '*, owner: userprofile(*), main_muscle_filled: muscles(*), template_items: template_items(*, exercise: exercises(*, muscles(*), exercise_categories(*)))'
+    )
+    .or(`userid.eq.${userId}, public.eq.true`);
   if (error || !data) {
     logger(error || 'No data');
     return {

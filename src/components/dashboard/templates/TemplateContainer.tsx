@@ -1,4 +1,3 @@
-import { formatRelative } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { FC, forwardRef, useState } from 'react';
 import { HTMLAttributes } from 'react';
@@ -28,14 +27,6 @@ const TemplateContainer: FC<TemplateContainerProps> = forwardRef<
 
   const socialContext = useSocial();
   const router = useRouter();
-
-  const lastPerformedDate = template.last_performed
-    ? new Date(template.last_performed)
-    : null;
-
-  const lastPerformedText = lastPerformedDate
-    ? formatRelative(lastPerformedDate, Date.now())
-    : 'Never';
 
   const [_templateName, setTemplateName] = useState<string>(template.name);
   const [loadingTemplate, setLoadingTemplate] = useState<boolean>(false);
@@ -84,13 +75,18 @@ const TemplateContainer: FC<TemplateContainerProps> = forwardRef<
               <span className='text-sm text-red-500'>{errorMessage}</span>
             )}
 
-            {template.amount_of_times_performed &&
-              template.amount_of_times_performed > 0 && (
-                <span>
-                  Performed {template.amount_of_times_performed} times
+            {template.owner && (
+              <span className='text-sm text-gray-500'>
+                Created by {template.owner.username}
+              </span>
+            )}
+            {template.template_items.map((item) => {
+              return (
+                <span className='text-sm text-gray-500' key={item.id}>
+                  {item.amount_of_sets} sets {item.exercise?.name}
                 </span>
-              )}
-            <span>Last Performed: {lastPerformedText}</span>
+              );
+            })}
           </div>
           <div className='flex flex-col items-end justify-between gap-2'>
             <span className='text-sm text-gray-500'>
