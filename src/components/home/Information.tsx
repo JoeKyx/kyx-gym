@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React, { FC, useState } from 'react';
 import { animated, useInView, useTransition } from 'react-spring';
+import { useSwipeable } from 'react-swipeable';
 
 import Button from '@/components/buttons/Button';
 
@@ -84,8 +85,13 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
     }
   };
 
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => next(),
+    onSwipedRight: () => prev(),
+  });
+
   return (
-    <div className='relative h-full bg-black bg-opacity-60'>
+    <div className='relative h-full bg-black bg-opacity-60' {...swipeHandlers}>
       <Image
         src='/images/bg/ancient_ninja_gym.jpeg'
         layout='fill'
@@ -128,6 +134,8 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
                 width={250}
                 height={500}
                 alt='App Screenshot'
+                priority
+                placeholder='empty'
               />
               <div className='mt-4 text-white'>
                 <h2 className='text-xl font-semibold'>{item.title}</h2>
