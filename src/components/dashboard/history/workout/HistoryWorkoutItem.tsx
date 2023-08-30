@@ -3,6 +3,7 @@ import { HTMLAttributes } from 'react';
 import React from 'react';
 
 import { cn } from '@/lib';
+import logger from '@/lib/logger';
 
 import HistoryWorkoutSet from '@/components/dashboard/history/workout/HistoryWorkoutSet';
 import {
@@ -25,6 +26,7 @@ const HistoryWorkoutItem: FC<HistoryWorkoutItemProps> = forwardRef<
   const musclesUsed = workoutItem.exercises?.muscles
     ?.map((muscle) => muscle.name)
     .join(', ');
+  logger(workoutItem.exercises?.type, 'type');
 
   const firstColumn = () => {
     if (workoutItem.exercises?.type === 'weight') {
@@ -37,6 +39,7 @@ const HistoryWorkoutItem: FC<HistoryWorkoutItemProps> = forwardRef<
   };
 
   const secondColumn = () => {
+    logger(workoutItem.exercises?.type, 'type');
     if (workoutItem.exercises?.type === 'weight') {
       return 'Weight';
     } else {
@@ -72,12 +75,12 @@ const HistoryWorkoutItem: FC<HistoryWorkoutItemProps> = forwardRef<
           <span className='w-20 text-left text-sm text-gray-500'>
             {firstColumn()}
           </span>
-          {workoutItem.exercises?.type === 'weight' ||
-            (workoutItem.exercises?.type === 'speed' && (
-              <span className='w-20 text-left text-sm text-gray-500'>
-                {secondColumn()}
-              </span>
-            ))}
+          {(workoutItem.exercises?.type === 'weight' ||
+            workoutItem.exercises?.type === 'speed') && (
+            <span className='w-20 text-left text-sm text-gray-500'>
+              {secondColumn()}
+            </span>
+          )}
           <span className='w-6 text-left text-sm text-gray-500 md:w-16'>
             Type
           </span>

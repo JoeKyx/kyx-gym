@@ -91,6 +91,7 @@ export type Set = DBSet & {
 };
 
 export type PreviousSet = {
+  id: number;
   exercise_id: number;
   position: number;
   workout_item_id: number;

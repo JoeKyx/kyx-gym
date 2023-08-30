@@ -1,6 +1,8 @@
 import { CheckSquare, Square } from 'lucide-react';
 import { FC, useMemo } from 'react';
 
+import logger from '@/lib/logger';
+
 import { useActiveWorkout } from '@/components/context/ActiveWorkoutContext';
 import TypeDisplay from '@/components/dashboard/workout/active/TypeDisplay';
 import RecordFlame from '@/components/dashboard/workout/RecordFlame';
@@ -21,7 +23,7 @@ interface ActiveWorkoutSetRowProps {
   handleInputChange: (
     set: DBSet,
     field: 'weight' | 'reps' | 'speed' | 'distance',
-    value: number
+    value: string
   ) => void;
   handleSetTypeChange: (set: DBSet, type: DBSet['type']) => void;
   handleSetFinish: (set: DBSet) => void;
@@ -148,13 +150,23 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             <input
               type='text' // Change to text input
               inputMode='numeric' // Optimize keyboard for mobile devices
-              pattern='[0-9]*' // Allow only digits
               placeholder='KG'
-              value={inputValues[set.id]?.weight || set.weight || ''}
+              value={inputValues[set.id]?.weight || ''}
               onChange={(e) => {
-                // Filter the value to include only digits
-                const value = e.target.value.replace(/[^0-9]/g, '');
-                handleInputChange(set, 'weight', Number(value));
+                logger(e.target.value, 'e.target.value');
+                // Replace commas with dots, then filter the value for valid decimal inputs
+                let value = e.target.value
+                  .replace(/,/g, '.')
+                  .replace(/[^0-9.]/g, '');
+                logger(value, 'value');
+                // Only allow one dot
+                const dotIndex = value.indexOf('.');
+                if (dotIndex !== -1) {
+                  value = `${value.substring(0, dotIndex + 1)}${value
+                    .substring(dotIndex + 1)
+                    .replace(/\./g, '')}`;
+                }
+                handleInputChange(set, 'weight', value);
               }}
               className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
@@ -162,13 +174,22 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             <input
               type='text' // Change to text input
               inputMode='numeric' // Optimize keyboard for mobile devices
-              pattern='[0-9]*' // Allow only digits
+              // Allow only digits
               placeholder='Reps'
-              value={inputValues[set.id]?.reps || set.reps || ''}
+              value={inputValues[set.id]?.reps || ''}
               onChange={(e) => {
-                // Filter the value to include only digits
-                const value = e.target.value.replace(/[^0-9]/g, '');
-                handleInputChange(set, 'reps', Number(value));
+                // Replace commas with dots, then filter the value for valid decimal inputs
+                let value = e.target.value
+                  .replace(/,/g, '.')
+                  .replace(/[^0-9.]/g, '');
+                // Only allow one dot
+                const dotIndex = value.indexOf('.');
+                if (dotIndex !== -1) {
+                  value = `${value.substring(0, dotIndex + 1)}${value
+                    .substring(dotIndex + 1)
+                    .replace(/\./g, '')}`;
+                }
+                handleInputChange(set, 'reps', value);
               }}
               className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
@@ -180,13 +201,22 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             <input
               type='text' // Change to text input
               inputMode='numeric' // Optimize keyboard for mobile devices
-              pattern='[0-9]*' // Allow only digits
+              // Allow only digits
               placeholder='Minutes'
-              value={inputValues[set.id]?.speed || set.speed || ''}
+              value={inputValues[set.id]?.speed || ''}
               onChange={(e) => {
-                // Filter the value to include only digits
-                const value = e.target.value.replace(/[^0-9]/g, '');
-                handleInputChange(set, 'speed', Number(value));
+                // Replace commas with dots, then filter the value for valid decimal inputs
+                let value = e.target.value
+                  .replace(/,/g, '.')
+                  .replace(/[^0-9.]/g, '');
+                // Only allow one dot
+                const dotIndex = value.indexOf('.');
+                if (dotIndex !== -1) {
+                  value = `${value.substring(0, dotIndex + 1)}${value
+                    .substring(dotIndex + 1)
+                    .replace(/\./g, '')}`;
+                }
+                handleInputChange(set, 'speed', value);
               }}
               className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
@@ -194,13 +224,22 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             <input
               type='text' // Change to text input
               inputMode='numeric' // Optimize keyboard for mobile devices
-              pattern='[0-9]*' // Allow only digits
+              // Allow only digits
               placeholder='Kilometers'
-              value={inputValues[set.id]?.distance || set.distance || ''}
+              value={inputValues[set.id]?.distance || ''}
               onChange={(e) => {
-                // Filter the value to include only digits
-                const value = e.target.value.replace(/[^0-9]/g, '');
-                handleInputChange(set, 'distance', Number(value));
+                // Replace commas with dots, then filter the value for valid decimal inputs
+                let value = e.target.value
+                  .replace(/,/g, '.')
+                  .replace(/[^0-9.]/g, '');
+                // Only allow one dot
+                const dotIndex = value.indexOf('.');
+                if (dotIndex !== -1) {
+                  value = `${value.substring(0, dotIndex + 1)}${value
+                    .substring(dotIndex + 1)
+                    .replace(/\./g, '')}`;
+                }
+                handleInputChange(set, 'distance', value);
               }}
               className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
@@ -212,13 +251,22 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             <input
               type='text' // Change to text input
               inputMode='numeric' // Optimize keyboard for mobile devices
-              pattern='[0-9]*' // Allow only digits
+              // Allow only digits
               placeholder='Reps'
-              value={inputValues[set.id]?.reps || set.reps || ''}
+              value={inputValues[set.id]?.reps || ''}
               onChange={(e) => {
-                // Filter the value to include only digits
-                const value = e.target.value.replace(/[^0-9]/g, '');
-                handleInputChange(set, 'reps', Number(value));
+                // Replace commas with dots, then filter the value for valid decimal inputs
+                let value = e.target.value
+                  .replace(/,/g, '.')
+                  .replace(/[^0-9.]/g, '');
+                // Only allow one dot
+                const dotIndex = value.indexOf('.');
+                if (dotIndex !== -1) {
+                  value = `${value.substring(0, dotIndex + 1)}${value
+                    .substring(dotIndex + 1)
+                    .replace(/\./g, '')}`;
+                }
+                handleInputChange(set, 'reps', value);
               }}
               className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
               disabled={set.is_finished}
@@ -234,11 +282,13 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
         />
 
         <div className='flex w-14 items-center'>
-          {set.previous_set && workoutItem.exercises?.type === 'weight' && (
-            <span className='text-start text-xs text-gray-500'>
-              {set.previous_set.weight} KG x {set.previous_set.reps}
-            </span>
-          )}
+          {set.previous_set &&
+            workoutItem.exercises?.type === 'weight' &&
+            set.previous_set.id != set.id && (
+              <span className='text-start text-xs text-gray-500'>
+                {set.previous_set.weight} KG x {set.previous_set.reps}
+              </span>
+            )}
           <RecordFlame
             isWeight={isHighestInWeight()}
             isVolume={isHighestInVolume()}

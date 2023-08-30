@@ -2,7 +2,14 @@ import _ from 'lodash';
 import { HelpCircle, Loader2Icon, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import finishedWorkoutSound from 'public/sounds/workout-finished.mp3';
-import { FC, forwardRef, useCallback, useMemo, useState } from 'react';
+import {
+  FC,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { HTMLAttributes } from 'react';
 import React from 'react';
 
@@ -34,14 +41,18 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   HTMLDivElement,
   ActiveWorkoutProps
 >((props, ref) => {
+  type InputValue = {
+    weight?: number;
+    reps?: number;
+    distance?: number;
+    speed?: number;
+  };
+  type InputValues = Record<string, InputValue>;
+
   const { className, ...rest } = props;
 
-  const [inputValues, setInputValues] = useState<
-    Record<
-      string,
-      { weight?: number; reps?: number; distance?: number; speed?: number }
-    >
-  >({});
+  const [inputValues, setInputValues] = useState<InputValues>({});
+
   const [loadingAddSet, setLoadingAddSet] = useState<Record<number, boolean>>(
     {}
   );
@@ -55,6 +66,24 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
 
   const activeWorkoutContext = useActiveWorkout();
   const workout = activeWorkoutContext.activeWorkout;
+
+  useEffect(() => {
+    // Set initally input values
+    if (workout) {
+      const newInputValues: InputValues = {};
+      workout.workout_items.forEach((item) => {
+        item.sets.forEach((set) => {
+          newInputValues[set.id] = {
+            weight: set.weight ?? undefined,
+            reps: set.reps ?? undefined,
+            distance: set.distance ?? undefined,
+            speed: set.speed ?? undefined,
+          };
+        });
+      });
+      setInputValues(newInputValues);
+    }
+  }, [workout]);
 
   const socialContext = useSocial();
 
@@ -88,7 +117,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const handleInputChange = (
     set: Set,
     field: 'weight' | 'reps' | 'speed' | 'distance',
-    value: number
+    value: string
   ) => {
     const newValues = { ...inputValues[set.id], [field]: value };
     setInputValues({ ...inputValues, [set.id]: newValues });
@@ -253,19 +282,21 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
             </div>
             <div className='flex w-full flex-col md:flex-row'>
               <div className='flex w-full flex-col md:w-1/2'>
-                {item.sets.map((set, setIndex) => (
-                  <React.Fragment key={setIndex}>
-                    <ActiveWorkoutSetRow
-                      set={set}
-                      setIndex={setIndex}
-                      inputValues={inputValues}
-                      handleInputChange={handleInputChange}
-                      handleSetTypeChange={handleSetTypeChange}
-                      handleSetFinish={handleSetFinish}
-                      workoutItem={item}
-                    />
-                  </React.Fragment>
-                ))}
+                {item.sets
+                  .sort((a, b) => (a.position || 0) - (b.position || 0))
+                  .map((set, setIndex) => (
+                    <React.Fragment key={setIndex}>
+                      <ActiveWorkoutSetRow
+                        set={set}
+                        setIndex={setIndex}
+                        inputValues={inputValues}
+                        handleInputChange={handleInputChange}
+                        handleSetTypeChange={handleSetTypeChange}
+                        handleSetFinish={handleSetFinish}
+                        workoutItem={item}
+                      />
+                    </React.Fragment>
+                  ))}
                 <div className='mt-4 flex justify-start'>
                   <Button
                     variant='primary'

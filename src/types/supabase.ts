@@ -817,6 +817,7 @@ export interface Database {
           user_id: string;
         };
         Returns: {
+          id: number;
           exercise_id: number;
           position: number;
           workout_item_id: number;
