@@ -19,6 +19,8 @@ import {
   updateWorkoutInDB,
 } from '@/lib/supabase-util';
 
+import { useSocial } from '@/components/context/SocialContext';
+
 import {
   DBCategory,
   DBInsertExercise,
@@ -116,6 +118,7 @@ export function ActiveWorkoutProvider({
   const [records, setRecords] = useState<Record[]>([]);
   const [loadingExercises, setLoadingExercises] = useState<number>(0);
   const [_error, setError] = useState<string | null>(null);
+  const socialContext = useSocial();
 
   // timer is the time in seconds since the workout started
 
@@ -129,10 +132,11 @@ export function ActiveWorkoutProvider({
         return;
       }
       setActiveWorkout(filledWorkout.data);
+      socialContext?.setHasActiveWorkout(filledWorkout.data.id);
       setLoading(false);
     };
     loadData();
-  }, [setActiveWorkout, workout_id]);
+  }, [setActiveWorkout, socialContext, workout_id]);
 
   useEffect(() => {
     if (!activeWorkout) return;
@@ -393,6 +397,7 @@ export function ActiveWorkoutProvider({
     setActiveWorkout(newWorkout);
     const res = await finishWorkoutInDB(workout_id as number);
     if (res.success) {
+      socialContext?.setHasNoActiveWorkout();
       return {
         success: true,
         message: 'Successfully finished workout',

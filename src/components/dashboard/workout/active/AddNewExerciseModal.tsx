@@ -16,7 +16,6 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/Dropdown';
 import {
@@ -178,9 +177,9 @@ const AddNewExerciseModal: FC<AddNewExerciseModalProps> = ({
   return (
     <Drawer.Root dismissible={true} open={open} onOpenChange={onClose}>
       <Drawer.Portal>
-        <Drawer.Overlay className='fixed inset-0 bg-black/40' />
+        <Drawer.Overlay className='fixed inset-0 bg-black/40 md:mb-0' />
         <Drawer.Content className='fixed bottom-0 left-0 right-0 mt-24 flex flex-col rounded-t-[10px] bg-zinc-100'>
-          <div className='flex-1 rounded-t-[10px] bg-white p-4'>
+          <div className='flex-1 rounded-t-[10px] bg-white p-4 pb-16 md:pb-0'>
             <div className='mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-zinc-300' />
             <div className='mx-auto max-w-md'>
               <Drawer.Title className='mb-4 font-medium'>
@@ -262,15 +261,26 @@ const AddNewExerciseModal: FC<AddNewExerciseModalProps> = ({
                   name='muscles'
                   control={form.control}
                   render={() => (
-                    <FormItem className='my-2'>
+                    <FormItem className='my-2 flex flex-col'>
+                      <FormLabel>Muscles</FormLabel>
                       <DropdownMenu>
                         <FormControl>
                           <DropdownMenuTrigger asChild>
-                            <Button variant='outline'>Muscles</Button>
+                            <Button variant='light'>
+                              {selectedMuscles.length
+                                ? selectedMuscles
+                                    .map(
+                                      (muscleId) =>
+                                        availableMuscles.find(
+                                          (muscle) => muscle.id === muscleId
+                                        )?.name
+                                    )
+                                    .join(', ')
+                                : 'Select Muscles to filter'}
+                            </Button>
                           </DropdownMenuTrigger>
-                        </FormControl>
+                        </FormControl>{' '}
                         <DropdownMenuContent>
-                          <DropdownMenuLabel>Muscles</DropdownMenuLabel>
                           <DropdownMenuGroup>
                             {availableMuscles.map((muscle) => (
                               <DropdownMenuCheckboxItem

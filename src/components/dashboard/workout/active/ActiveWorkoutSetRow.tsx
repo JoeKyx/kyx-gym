@@ -149,7 +149,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
           <>
             <input
               type='text' // Change to text input
-              inputMode='numeric' // Optimize keyboard for mobile devices
+              inputMode='decimal' // Optimize keyboard for mobile devices
               placeholder='KG'
               value={inputValues[set.id]?.weight || ''}
               onChange={(e) => {
@@ -173,7 +173,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             />
             <input
               type='text' // Change to text input
-              inputMode='numeric' // Optimize keyboard for mobile devices
+              inputMode='decimal' // Optimize keyboard for mobile devices
               // Allow only digits
               placeholder='Reps'
               value={inputValues[set.id]?.reps || ''}
@@ -200,7 +200,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
           <>
             <input
               type='text' // Change to text input
-              inputMode='numeric' // Optimize keyboard for mobile devices
+              inputMode='decimal' // Optimize keyboard for mobile devices
               // Allow only digits
               placeholder='Minutes'
               value={inputValues[set.id]?.speed || ''}
@@ -223,7 +223,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             />
             <input
               type='text' // Change to text input
-              inputMode='numeric' // Optimize keyboard for mobile devices
+              inputMode='decimal' // Optimize keyboard for mobile devices
               // Allow only digits
               placeholder='Kilometers'
               value={inputValues[set.id]?.distance || ''}
@@ -250,8 +250,9 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
           <>
             <input
               type='text' // Change to text input
-              inputMode='numeric' // Optimize keyboard for mobile devices
+              inputMode='decimal' // Optimize keyboard for mobile devices
               // Allow only digits
+
               placeholder='Reps'
               value={inputValues[set.id]?.reps || ''}
               onChange={(e) => {

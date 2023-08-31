@@ -1,9 +1,11 @@
 'use client';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Dumbbell, User, Users } from 'lucide-react';
+import Link from 'next/link';
 import { FC, forwardRef } from 'react';
 import { HTMLAttributes } from 'react';
 
+import { useSocial } from '@/components/context/SocialContext';
 import FriendsArea from '@/components/dashboard/friends/FriendsArea';
 import ProfileTab from '@/components/dashboard/mobile/ProfileTab';
 import WorkoutTab from '@/components/dashboard/mobile/WorkoutTab';
@@ -16,8 +18,20 @@ const DashboardMobile: FC<DashboardMobileProps> = forwardRef<
 >((props, ref) => {
   const { className, ...rest } = props;
 
+  const socialContext = useSocial();
+
+  const activeWorkout = socialContext?.activeWorkout;
+
   return (
     <div className={className} ref={ref} {...rest}>
+      {activeWorkout && (
+        <Link
+          className='bg-primary-300 hover:bg-primary-500 fixed left-0 top-0 z-50 w-full p-4 text-center text-black hover:text-white'
+          href={`/dashboard/workout/${activeWorkout}`}
+        >
+          Go to current Workout
+        </Link>
+      )}
       <Tabs.Root
         className='flex h-screen w-full flex-col justify-start'
         defaultValue='profile'

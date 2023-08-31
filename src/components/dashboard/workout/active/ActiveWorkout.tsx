@@ -68,20 +68,29 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const workout = activeWorkoutContext.activeWorkout;
 
   useEffect(() => {
-    // Set initally input values
     if (workout) {
-      const newInputValues: InputValues = {};
-      workout.workout_items.forEach((item) => {
-        item.sets.forEach((set) => {
-          newInputValues[set.id] = {
-            weight: set.weight ?? undefined,
-            reps: set.reps ?? undefined,
-            distance: set.distance ?? undefined,
-            speed: set.speed ?? undefined,
-          };
+      setInputValues((prevInputValues) => {
+        const newInputValues: InputValues = {};
+        workout.workout_items.forEach((item) => {
+          item.sets.forEach((set) => {
+            newInputValues[set.id] = {
+              weight:
+                prevInputValues[set.id]?.weight ??
+                (set.weight !== null ? set.weight : undefined),
+              reps:
+                prevInputValues[set.id]?.reps ??
+                (set.reps !== null ? set.reps : undefined),
+              distance:
+                prevInputValues[set.id]?.distance ??
+                (set.distance !== null ? set.distance : undefined),
+              speed:
+                prevInputValues[set.id]?.speed ??
+                (set.speed !== null ? set.speed : undefined),
+            };
+          });
         });
+        return newInputValues;
       });
-      setInputValues(newInputValues);
     }
   }, [workout]);
 
