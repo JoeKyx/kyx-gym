@@ -970,18 +970,19 @@ export const hasActiveWorkout = async (userId: string) => {
 };
 
 export const deleteWorkout = async (workoutId: number) => {
-  const { data, error } = await supabase
+  logger(workoutId, 'workoutId to delete');
+  const { error } = await supabase
     .from('workouts')
     .delete()
     .eq('id', workoutId);
-  if (error || !data) {
+  if (error) {
     logger(error || 'No data');
     return {
       success: false,
       error: error?.message || 'Error deleting workout',
     };
   }
-  return { success: true, data };
+  return { success: true };
 };
 
 export const deleteAllActiveWorkouts = async (userId: string) => {

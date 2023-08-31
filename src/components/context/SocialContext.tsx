@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 
 import logger from '@/lib/logger';
-import { hasActiveWorkout, loadLevelXp } from '@/lib/supabase-util';
+import { loadLevelXp } from '@/lib/supabase-util';
 
 import { Database } from '@/types/supabase';
 import { DBExperienceLevel } from '@/types/Workout';
@@ -54,8 +54,6 @@ interface ISocial {
   declineFriendRequest: (friendId: string) => Promise<FriendActionResponse>;
   loadUserProfile: (userid: string) => Promise<UserProfile | null>;
   updateProfileIcon: (iconId: ProfileIcon) => Promise<boolean>;
-  setHasActiveWorkout: (id: number) => void;
-  setHasNoActiveWorkout: () => void;
 }
 
 interface SetUserProfileAction {
@@ -118,11 +116,6 @@ interface SetUsernameAction {
   payload: string;
 }
 
-interface SetActiveWorkoutAction {
-  type: 'SET_ACTIVE_WORKOUT';
-  payload: number | null;
-}
-
 type SocialAction =
   | SetOutgoingFriendRequestsAction
   | SetUserProfileAction
@@ -135,8 +128,7 @@ type SocialAction =
   | SetDeleteFriendRequestAction
   | SetFeedAction
   | SetShowProfilePictureModalAction
-  | SetUsernameAction
-  | SetActiveWorkoutAction;
+  | SetUsernameAction;
 
 // Define the initial state
 const initialSocial: ISocial = {
@@ -181,12 +173,6 @@ const initialSocial: ISocial = {
   },
   setUsername: async (_username: string) => {
     return { success: false, errorMsg: 'I am not a real Context :(' };
-  },
-  setHasActiveWorkout: (_number: number) => {
-    return;
-  },
-  setHasNoActiveWorkout: () => {
-    return;
   },
 };
 
@@ -244,8 +230,6 @@ function SocialReducer(state: ISocial, action: SocialAction): ISocial {
           username: action.payload,
         },
       };
-    case 'SET_ACTIVE_WORKOUT':
-      return { ...state, activeWorkout: action.payload };
 
     default:
       return state;
@@ -299,23 +283,6 @@ export function SocialProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'SET_FRIEND_LIST', payload: [] });
     }
   }, [friendIds, supabase]);
-
-  useEffect(() => {
-    if (user) {
-      const loadHasActiveWorkout = async () => {
-        const activeWorkoutRes = await hasActiveWorkout(user.id);
-        if (activeWorkoutRes.success && activeWorkoutRes.data) {
-          dispatch({
-            type: 'SET_ACTIVE_WORKOUT',
-            payload: activeWorkoutRes.data.id,
-          });
-        }
-      };
-      loadHasActiveWorkout();
-    } else {
-      dispatch({ type: 'SET_ACTIVE_WORKOUT', payload: null });
-    }
-  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -677,22 +644,6 @@ export function SocialProvider({ children }: { children: ReactNode }) {
       .subscribe();
   }, [user, supabase, fetchFriendList, fetchFriendRequests]);
 
-  const setActiveWorkout = async (id: number) => {
-    if (!user) {
-      return;
-    }
-    if (id) {
-      dispatch({ type: 'SET_ACTIVE_WORKOUT', payload: id });
-    }
-  };
-
-  const setHasNoActiveWorkout = async () => {
-    if (!user) {
-      return;
-    }
-    dispatch({ type: 'SET_ACTIVE_WORKOUT', payload: null });
-  };
-
   if (!hydrated) {
     return <></>;
   }
@@ -711,8 +662,6 @@ export function SocialProvider({ children }: { children: ReactNode }) {
         setUsername,
         updateProfileIcon,
         setShowProfilePictureModal,
-        setHasActiveWorkout: setActiveWorkout,
-        setHasNoActiveWorkout,
       }}
     >
       {children}

@@ -7,6 +7,7 @@ import {
   addNewSet,
   createNewWorkoutItems,
   deleteSetInDB,
+  deleteWorkout as deleteWorkoutInDB,
   deleteWorkoutIteminDB,
   finishWorkoutInDB,
   getAllExerciseCategories,
@@ -18,8 +19,6 @@ import {
   updateSetInDB,
   updateWorkoutInDB,
 } from '@/lib/supabase-util';
-
-import { useSocial } from '@/components/context/SocialContext';
 
 import {
   DBCategory,
@@ -60,6 +59,7 @@ interface IActiveWorkoutContext {
   deleteWorkoutItem: (
     workout_item_id: number
   ) => Promise<{ success: boolean; message: string }>;
+  deleteWorkout: () => Promise<{ success: boolean; message: string }>;
 }
 
 const initialActiveWorkoutContext: IActiveWorkoutContext = {
@@ -96,6 +96,9 @@ const initialActiveWorkoutContext: IActiveWorkoutContext = {
   deleteWorkoutItem: async () => {
     return { success: false, message: 'Error deleting workout item' };
   },
+  deleteWorkout: async () => {
+    return { success: false, message: 'Error deleting workout' };
+  },
   loadingExercises: null,
 };
 
@@ -118,7 +121,6 @@ export function ActiveWorkoutProvider({
   const [records, setRecords] = useState<Record[]>([]);
   const [loadingExercises, setLoadingExercises] = useState<number>(0);
   const [_error, setError] = useState<string | null>(null);
-  const socialContext = useSocial();
 
   // timer is the time in seconds since the workout started
 
@@ -132,11 +134,11 @@ export function ActiveWorkoutProvider({
         return;
       }
       setActiveWorkout(filledWorkout.data);
-      socialContext?.setHasActiveWorkout(filledWorkout.data.id);
+
       setLoading(false);
     };
     loadData();
-  }, [setActiveWorkout, socialContext, workout_id]);
+  }, [setActiveWorkout, workout_id]);
 
   useEffect(() => {
     if (!activeWorkout) return;
@@ -397,7 +399,6 @@ export function ActiveWorkoutProvider({
     setActiveWorkout(newWorkout);
     const res = await finishWorkoutInDB(workout_id as number);
     if (res.success) {
-      socialContext?.setHasNoActiveWorkout();
       return {
         success: true,
         message: 'Successfully finished workout',
@@ -407,6 +408,24 @@ export function ActiveWorkoutProvider({
       logger(res.error, 'Error finishing workout');
       setError(res.error || 'Error finishing workout');
       return { success: false, message: 'Error finishing workout' };
+    }
+  };
+
+  const deleteWorkout = async () => {
+    if (!activeWorkout)
+      return { success: false, message: 'Error deleting workout' };
+    const res = await deleteWorkoutInDB(workout_id as number);
+    if (res.success) {
+      setActiveWorkout(null);
+
+      return {
+        success: true,
+        message: 'Successfully deleted workout',
+        id: activeWorkout.id,
+      };
+    } else {
+      setError(res.error || 'Error deleting workout');
+      return { success: false, message: 'Error deleting workout' };
     }
   };
 
@@ -439,6 +458,7 @@ export function ActiveWorkoutProvider({
         addExercisesToWorkout,
         updateSet,
         addSet,
+        deleteWorkout,
         deleteSet,
         updateWorkoutName,
         finishWorkout,

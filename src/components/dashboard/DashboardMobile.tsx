@@ -2,8 +2,11 @@
 import * as Tabs from '@radix-ui/react-tabs';
 import { Dumbbell, User, Users } from 'lucide-react';
 import Link from 'next/link';
-import { FC, forwardRef } from 'react';
+import { FC, forwardRef, useEffect, useState } from 'react';
 import { HTMLAttributes } from 'react';
+
+import logger from '@/lib/logger';
+import { hasActiveWorkout } from '@/lib/supabase-util';
 
 import { useSocial } from '@/components/context/SocialContext';
 import FriendsArea from '@/components/dashboard/friends/FriendsArea';
@@ -11,23 +14,79 @@ import ProfileTab from '@/components/dashboard/mobile/ProfileTab';
 import WorkoutTab from '@/components/dashboard/mobile/WorkoutTab';
 
 type DashboardMobileProps = HTMLAttributes<HTMLDivElement>;
-
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => void;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
 const DashboardMobile: FC<DashboardMobileProps> = forwardRef<
   HTMLDivElement,
   DashboardMobileProps
 >((props, ref) => {
   const { className, ...rest } = props;
+  const [showInstallButton, setShowInstallButton] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
 
+  const [activeWorkoutId, setActiveWorkoutId] = useState<number | null>(null);
   const socialContext = useSocial();
 
-  const activeWorkout = socialContext?.activeWorkout;
+  function isBeforeInstallPromptEvent(e: Event): e is BeforeInstallPromptEvent {
+    return 'prompt' in e && 'userChoice' in e;
+  }
+
+  useEffect(() => {
+    const fetchActiveWorkoutId = async () => {
+      if (socialContext?.userProfile?.userid === undefined) return;
+      const res = await hasActiveWorkout(socialContext.userProfile.userid);
+      if (!res.success || !res.data) return;
+      setActiveWorkoutId(res.data.id);
+    };
+    fetchActiveWorkoutId();
+  }, [socialContext?.userProfile?.userid]);
+
+  const handleInstallClick = () => {
+    if (!deferredPrompt) return;
+    setShowInstallButton(false);
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        logger('User accepted the A2HS prompt');
+      } else {
+        logger('User dismissed the A2HS prompt');
+      }
+      setDeferredPrompt(null);
+    });
+  };
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if (isBeforeInstallPromptEvent(e)) {
+        e.preventDefault();
+        setDeferredPrompt(e);
+        setShowInstallButton(true);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+    };
+  }, []);
 
   return (
     <div className={className} ref={ref} {...rest}>
-      {activeWorkout && (
+      {showInstallButton && (
+        <div
+          className='bg-primary-300 hover:bg-primary-500 fixed left-0 top-0 z-50 w-full p-4 text-center text-black hover:text-white'
+          onClick={handleInstallClick}
+        >
+          Click here to install the app!
+        </div>
+      )}
+      {activeWorkoutId && (
         <Link
           className='bg-primary-300 hover:bg-primary-500 fixed left-0 top-0 z-50 w-full p-4 text-center text-black hover:text-white'
-          href={`/dashboard/workout/${activeWorkout}`}
+          href={`/dashboard/workout/${activeWorkoutId}`}
         >
           Go to current Workout
         </Link>

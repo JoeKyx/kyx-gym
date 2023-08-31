@@ -21,6 +21,7 @@ import IconButton from '@/components/buttons/IconButton';
 import { useActiveWorkout } from '@/components/context/ActiveWorkoutContext';
 import { useSocial } from '@/components/context/SocialContext';
 import ActiveWorkoutSetRow from '@/components/dashboard/workout/active/ActiveWorkoutSetRow';
+import DeleteWorkoutModal from '@/components/dashboard/workout/active/DeleteWorkoutModal';
 import ProgressBar from '@/components/dashboard/workout/active/ProgressBar';
 import { WorkoutDuration } from '@/components/dashboard/workout/active/WorkoutDuration';
 import WorkoutNotFinishedModal from '@/components/dashboard/workout/active/WorkoutNotFinishedModal';
@@ -56,8 +57,13 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const [loadingAddSet, setLoadingAddSet] = useState<Record<number, boolean>>(
     {}
   );
+
+  const [deletingWorkoutLoading, setDeletingWorkoutLoading] =
+    useState<boolean>(false);
   const [showHowTo, setShowHowTo] = useState<Record<number, boolean>>({});
   const [showWorkoutNotFinishedModal, setShowWorkoutNotFinishedModal] =
+    useState<boolean>(false);
+  const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] =
     useState<boolean>(false);
   const [finishedWorkoutLoading, setFinishedWorkoutLoading] =
     useState<boolean>(false);
@@ -189,6 +195,22 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
     }
   };
 
+  const onContinueWorkout = () => {
+    setShowDeleteWorkoutModal(true);
+  };
+
+  const onDeleteWorkout = async () => {
+    setDeletingWorkoutLoading(true);
+    const delWorkoutContext = await activeWorkoutContext.deleteWorkout();
+    if (delWorkoutContext.success) {
+      setShowDeleteWorkoutModal(false);
+      router.push('/dashboard');
+    } else {
+      setError(delWorkoutContext.message);
+      setDeletingWorkoutLoading(false);
+    }
+  };
+
   let totalWeight = 0;
   if (!workout)
     return (
@@ -237,7 +259,14 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
               {error && <span className='text-red-500'>{error}</span>}
             </div>
           </div>
-          <div className='flex w-44 items-end justify-end'>
+          <div className='flex w-44 flex-col items-end justify-between gap-4'>
+            <Button
+              variant='ghost'
+              onClick={() => setShowDeleteWorkoutModal(true)}
+              isLoading={deletingWorkoutLoading}
+            >
+              Delete Workout
+            </Button>
             <Button
               variant={allSetsInWorkoutFinished() ? 'primary' : 'ghost'}
               onClick={handleFinishWorkout}
@@ -359,6 +388,11 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
         open={showWorkoutNotFinishedModal}
         onCancel={() => setShowWorkoutNotFinishedModal(false)}
         onContinue={finishWorkout}
+      />
+      <DeleteWorkoutModal
+        open={showDeleteWorkoutModal}
+        onContinue={onContinueWorkout}
+        onDelete={onDeleteWorkout}
       />
     </div>
   );
