@@ -15,10 +15,11 @@ export default async function Page({ params }: pageProps) {
     const supabase = createServerComponentClient<Database>({
       cookies,
     });
+    // TODO: set is loading record is loading set - can be optimized...
     const { data, error } = await supabase
       .from('workouts')
       .select(
-        '*, workout_items(*, exercises(*, muscles(*), exercise_categories(*)), sets(*, records(*)))'
+        '*, workout_items(*, exercises(*, muscles(*), exercise_categories(*)), sets(*, records(*, sets(*))))'
       )
       .eq('id', params.id)
       .single();
