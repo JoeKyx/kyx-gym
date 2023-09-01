@@ -9,6 +9,34 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      ai_advice: {
+        Row: {
+          advice: string;
+          created_at: string;
+          id: number;
+          user_id: string;
+        };
+        Insert: {
+          advice: string;
+          created_at?: string;
+          id?: number;
+          user_id: string;
+        };
+        Update: {
+          advice?: string;
+          created_at?: string;
+          id?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ai_advice_user_id_fkey';
+            columns: ['user_id'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
       calendar: {
         Row: {
           created_at: string;
