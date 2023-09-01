@@ -1,5 +1,6 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, formatDistance } from 'date-fns';
+import { BrainCog } from 'lucide-react';
 import { FC, forwardRef, useCallback, useEffect, useState } from 'react';
 import { HTMLAttributes } from 'react';
 
@@ -94,7 +95,10 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
         {...rest}
       >
         <div className='flex h-full flex-col'>
-          <h3 className='text-center'>Generate AI advice</h3>
+          <div className='mb-2 flex items-center justify-start gap-5'>
+            <BrainCog className='text-primary-500' />
+            <span className='text-xl'>KyxAi Advice</span>
+          </div>
           {error && <p className='text-sm text-red-500'>{error}</p>}
           {!completed3Workouts && (
             <p className='text-sm text-gray-500'>
@@ -133,12 +137,14 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
                   Generate Advice
                 </Button>
               ) : (
-                <div className='flex flex-col gap-4'>
+                <div className='mt-2 flex flex-col'>
                   <p className='text-sm text-gray-500'>
-                    You can generate a new advice every 3 days.
+                    Generated{' '}
+                    {formatDistance(new Date(advice.created_at), new Date())}{' '}
+                    ago
                   </p>
                   <p className='text-sm text-gray-500'>
-                    Generated {new Date(advice.created_at).toLocaleDateString()}
+                    You can generate a new advice every 3 days.
                   </p>
                 </div>
               )}
