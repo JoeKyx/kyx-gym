@@ -282,7 +282,7 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
           onSetChange={(newType) => handleSetTypeChange(set, newType)}
         />
 
-        <div className='flex w-14 items-center'>
+        <div className='flex flex-grow items-center'>
           {set.previous_set &&
             workoutItem.exercises?.type === 'weight' &&
             set.previous_set.id != set.id && (

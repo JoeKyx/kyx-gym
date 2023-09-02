@@ -33,6 +33,20 @@ export type DBExperienceLevel =
 export type DBExerciseType =
   Database['public']['Tables']['exercises']['Row']['type'];
 
+export type FavoriteExercise =
+  Database['public']['Views']['favorite_exercise']['Row'];
+
+export type MaxVolumeSet =
+  Database['public']['Views']['most_volume_set']['Row'];
+
+export type MaxWeightSet = Database['public']['Views']['max_weight']['Row'];
+
+export type CategoryCountSummary =
+  Database['public']['Views']['category_count']['Row'];
+
+export type MuscleCountSummary =
+  Database['public']['Views']['muscles_count']['Row'];
+
 export enum SetType {
   Normal = 'normal',
   Drop = 'drop',

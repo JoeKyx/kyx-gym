@@ -127,8 +127,10 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
                 </div>
               )}
 
-              {!advice ||
-              differenceInDays(new Date(advice.created_at), new Date()) > 3 ? (
+              {(!advice ||
+                differenceInDays(new Date(advice.created_at), new Date()) >
+                  3) &&
+              profileContext.isOwn ? (
                 <Button
                   className='mt-4'
                   isLoading={loading}
@@ -137,16 +139,19 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
                   Generate Advice
                 </Button>
               ) : (
-                <div className='mt-2 flex flex-col'>
-                  <p className='text-sm text-gray-500'>
-                    Generated{' '}
-                    {formatDistance(new Date(advice.created_at), new Date())}{' '}
-                    ago
-                  </p>
-                  <p className='text-sm text-gray-500'>
-                    You can generate a new advice every 3 days.
-                  </p>
-                </div>
+                advice &&
+                profileContext.isOwn && (
+                  <div className='mt-2 flex flex-col'>
+                    <p className='text-sm text-gray-500'>
+                      Generated{' '}
+                      {formatDistance(new Date(advice.created_at), new Date())}{' '}
+                      ago
+                    </p>
+                    <p className='text-sm text-gray-500'>
+                      You can generate a new advice every 3 days.
+                    </p>
+                  </div>
+                )
               )}
             </div>
           )}

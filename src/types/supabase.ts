@@ -77,6 +77,12 @@ export interface Database {
             columns: ['workout_id'];
             referencedRelation: 'workouts';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'calendar_workout_id_fkey';
+            columns: ['workout_id'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['workout'];
           }
         ];
       };
@@ -152,10 +158,22 @@ export interface Database {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'exercisemuscles_exerciseid_fkey';
+            columns: ['exerciseid'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['exercise_id'];
+          },
+          {
             foreignKeyName: 'exercisemuscles_muscleid_fkey';
             columns: ['muscleid'];
             referencedRelation: 'muscles';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'exercisemuscles_muscleid_fkey';
+            columns: ['muscleid'];
+            referencedRelation: 'muscles_count';
+            referencedColumns: ['muscle_id'];
           }
         ];
       };
@@ -198,6 +216,12 @@ export interface Database {
             foreignKeyName: 'exercises_categoryid_fkey';
             columns: ['categoryid'];
             referencedRelation: 'exercise_categories';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'exercises_categoryid_fkey';
+            columns: ['categoryid'];
+            referencedRelation: 'category_count';
             referencedColumns: ['id'];
           }
         ];
@@ -353,23 +377,54 @@ export interface Database {
           }
         ];
       };
+      muscle_areas: {
+        Row: {
+          id: number;
+          name: string;
+        };
+        Insert: {
+          id?: number;
+          name: string;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
       muscles: {
         Row: {
           created_at: string;
           id: number;
+          muscle_area_id: number;
           name: string;
         };
         Insert: {
           created_at?: string;
           id?: number;
+          muscle_area_id: number;
           name: string;
         };
         Update: {
           created_at?: string;
           id?: number;
+          muscle_area_id?: number;
           name?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'muscles_muscle_area_id_fkey';
+            columns: ['muscle_area_id'];
+            referencedRelation: 'muscle_areas';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'muscles_muscle_area_id_fkey';
+            columns: ['muscle_area_id'];
+            referencedRelation: 'muscles_count';
+            referencedColumns: ['muscle_area_id'];
+          }
+        ];
       };
       news: {
         Row: {
@@ -465,6 +520,12 @@ export interface Database {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'records_exercise_id_fkey';
+            columns: ['exercise_id'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['exercise_id'];
+          },
+          {
             foreignKeyName: 'records_set_id_fkey';
             columns: ['set_id'];
             referencedRelation: 'sets';
@@ -535,6 +596,12 @@ export interface Database {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'sets_workout_id_fkey';
+            columns: ['workout_id'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['workout'];
+          },
+          {
             foreignKeyName: 'sets_workout_item_id_fkey';
             columns: ['workout_item_id'];
             referencedRelation: 'workout_items';
@@ -573,6 +640,12 @@ export interface Database {
             columns: ['exercise_id'];
             referencedRelation: 'exercises';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'template_items_exercise_id_fkey';
+            columns: ['exercise_id'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['exercise_id'];
           },
           {
             foreignKeyName: 'template_items_template_id_fkey';
@@ -619,6 +692,12 @@ export interface Database {
             columns: ['main_muscle'];
             referencedRelation: 'muscles';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'templates_main_muscle_fkey';
+            columns: ['main_muscle'];
+            referencedRelation: 'muscles_count';
+            referencedColumns: ['muscle_id'];
           },
           {
             foreignKeyName: 'templates_userid_fkey';
@@ -741,6 +820,12 @@ export interface Database {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'workout_items_exerciseid_fkey';
+            columns: ['exerciseid'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['exercise_id'];
+          },
+          {
             foreignKeyName: 'workout_items_template_fkey';
             columns: ['template'];
             referencedRelation: 'templates';
@@ -751,6 +836,12 @@ export interface Database {
             columns: ['workout'];
             referencedRelation: 'workouts';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'workout_items_workout_fkey';
+            columns: ['workout'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['workout'];
           }
         ];
       };
@@ -799,6 +890,12 @@ export interface Database {
             referencedColumns: ['id'];
           },
           {
+            foreignKeyName: 'workouts_mainmuscle_fkey';
+            columns: ['mainmuscle'];
+            referencedRelation: 'muscles_count';
+            referencedColumns: ['muscle_id'];
+          },
+          {
             foreignKeyName: 'workouts_template_id_fkey';
             columns: ['template_id'];
             referencedRelation: 'templates';
@@ -814,6 +911,126 @@ export interface Database {
       };
     };
     Views: {
+      category_count: {
+        Row: {
+          count: number | null;
+          id: number | null;
+          name: string | null;
+          user_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'workouts_userid_fkey';
+            columns: ['user_id'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
+      exercise_history: {
+        Row: {
+          distance: number | null;
+          exercise_id: number | null;
+          exercise_name: string | null;
+          max_weight: number | null;
+          reps: number | null;
+          speed: number | null;
+          type_of_exercise: Database['public']['Enums']['exercise_type'] | null;
+          user_id: string | null;
+          volume: number | null;
+          workout: number | null;
+          workout_finished_at: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sets_userid_fkey';
+            columns: ['user_id'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
+      favorite_exercise: {
+        Row: {
+          amount: number | null;
+          exercise_name: string | null;
+          exerciseid: number | null;
+          user_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'workout_items_exerciseid_fkey';
+            columns: ['exerciseid'];
+            referencedRelation: 'exercises';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'workout_items_exerciseid_fkey';
+            columns: ['exerciseid'];
+            referencedRelation: 'exercise_history';
+            referencedColumns: ['exercise_id'];
+          },
+          {
+            foreignKeyName: 'workouts_userid_fkey';
+            columns: ['user_id'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
+      max_weight: {
+        Row: {
+          finished_at: string | null;
+          name: string | null;
+          reps: number | null;
+          user_id: string | null;
+          weight: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sets_userid_fkey';
+            columns: ['user_id'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
+      most_volume_set: {
+        Row: {
+          finished_at: string | null;
+          name: string | null;
+          reps: number | null;
+          user_id: string | null;
+          volume: number | null;
+          weight: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sets_userid_fkey';
+            columns: ['user_id'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
+      muscles_count: {
+        Row: {
+          count: number | null;
+          muscle_area_id: number | null;
+          muscle_area_name: string | null;
+          muscle_id: number | null;
+          muscle_name: string | null;
+          userid: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'workouts_userid_fkey';
+            columns: ['userid'];
+            referencedRelation: 'userprofile';
+            referencedColumns: ['userid'];
+          }
+        ];
+      };
       unifiedfeed: {
         Row: {
           contentid: string | null;

@@ -6,6 +6,7 @@ import { FC, forwardRef, useState } from 'react';
 import { HTMLAttributes } from 'react';
 
 import { useProfile } from '@/components/context/ProfileContext';
+import ButtonLink from '@/components/links/ButtonLink';
 
 import { DBWorkout } from '@/types/Workout';
 
@@ -94,37 +95,45 @@ const HistoryChart: FC<HistoryChartProps> = forwardRef<
       <Title className='text-center font-semibold'>
         Last {lastWorkouts.length} Workouts
       </Title>
-      <div className='flex items-center justify-center space-x-4'>
-        <button
-          className={`w-20 rounded-md px-2 py-1 ${
-            categoryToShow === 'Weight'
-              ? 'bg-emerald-500 text-white'
-              : 'bg-gray-200 text-gray-700'
-          }`}
-          onClick={() => setCategoryToShow('Weight')}
+      <div className='flex justify-between'>
+        <div className='flex items-center justify-center space-x-4'>
+          <button
+            className={`w-20 rounded-md px-2 py-1 ${
+              categoryToShow === 'Weight'
+                ? 'bg-emerald-500 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+            onClick={() => setCategoryToShow('Weight')}
+          >
+            Weight
+          </button>
+          <button
+            className={`w-20 rounded-md px-2 py-1  ${
+              categoryToShow === 'Duration'
+                ? 'bg-fuchsia-500 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+            onClick={() => setCategoryToShow('Duration')}
+          >
+            Duration
+          </button>
+          <button
+            className={`w-20 rounded-md px-2 py-1  ${
+              categoryToShow === 'Stars'
+                ? 'bg-yellow-400 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+            onClick={() => setCategoryToShow('Stars')}
+          >
+            Stars
+          </button>
+        </div>
+
+        <ButtonLink
+          href={`/dashboard/profile/${profileContext.userProfile?.username}/stats`}
         >
-          Weight
-        </button>
-        <button
-          className={`w-20 rounded-md px-2 py-1  ${
-            categoryToShow === 'Duration'
-              ? 'bg-fuchsia-500 text-white'
-              : 'bg-gray-200 text-gray-700'
-          }`}
-          onClick={() => setCategoryToShow('Duration')}
-        >
-          Duration
-        </button>
-        <button
-          className={`w-20 rounded-md px-2 py-1  ${
-            categoryToShow === 'Stars'
-              ? 'bg-yellow-400 text-white'
-              : 'bg-gray-200 text-gray-700'
-          }`}
-          onClick={() => setCategoryToShow('Stars')}
-        >
-          Stars
-        </button>
+          Advanced Stats
+        </ButtonLink>
       </div>
       <AreaChart
         valueFormatter={formatter(categoryToShow)}

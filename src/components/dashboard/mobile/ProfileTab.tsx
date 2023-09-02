@@ -29,6 +29,12 @@ const ProfileTab: FC<ProfileTabProps> = forwardRef<
     );
   };
 
+  const onStatsClick = () => {
+    router.push(
+      `/dashboard/profile/${socialContext?.userProfile?.username}/stats`
+    );
+  };
+
   return (
     <div
       className={cn('flex h-full w-full flex-col gap-4', className)}
@@ -50,9 +56,9 @@ const ProfileTab: FC<ProfileTabProps> = forwardRef<
         onClickHandler={onHistoryClick}
       />
       <MobileImageButton
-        title='Stats - Coming Soon'
+        title='Stats'
         image='/images/dashboard/statsMobile.jpeg'
-        isDisabled={true}
+        onClickHandler={onStatsClick}
       />
     </div>
   );
