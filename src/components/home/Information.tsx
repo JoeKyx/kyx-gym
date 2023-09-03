@@ -289,9 +289,8 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
               </div>
 
               {/* Text container */}
-              <div
-                className={`flex w-1/3 flex-col items-start justify-start transition-opacity duration-300 `}
-              >
+              <div className='flex w-1/3 flex-col items-center justify-between transition-opacity duration-300'>
+                <div></div>
                 {images.map((image, i) => (
                   <div
                     className={`absolute ${
@@ -305,6 +304,12 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
                     <div className='text-white'>{image.element}</div>
                   </div>
                 ))}
+                <div className='flex flex-col items-center gap-3'>
+                  <span className='text-center text-white'>
+                    Do you have what it takes to become a Kyx Ninja?{' '}
+                  </span>
+                  <Button onClick={handleJoinNowClick}>Join Now!</Button>
+                </div>
               </div>
 
               {/* Menu */}
@@ -328,13 +333,6 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className='flex flex-col items-center gap-3'>
-              <span className='text-center text-white'>
-                Do you have what it takes to become a Kyx Ninja?{' '}
-              </span>
-              <Button onClick={handleJoinNowClick}>Join Now!</Button>
             </div>
           </div>
         </div>
