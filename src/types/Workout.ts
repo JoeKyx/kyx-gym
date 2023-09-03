@@ -92,6 +92,10 @@ export type Template = DBTemplate & {
   owner: UserProfile | null;
 };
 
+export type TemplateToCheck = DBTemplate & {
+  template_items: DBTemplateItem[];
+};
+
 export type TemplateItem = DBTemplateItem & {
   exercise: Exercise | null;
 };

@@ -666,6 +666,22 @@ export const addExercise = async (
   return { success: true, data: filledExercise };
 };
 
+const workoutItemsToTemplateItems = (
+  workoutItems: WorkoutItem[],
+  templateId: number
+): DBInsertTemplateItem[] => {
+  const templateItems: DBInsertTemplateItem[] = [];
+  workoutItems.forEach((workoutItem) => {
+    templateItems.push({
+      template_id: templateId,
+      exercise_id: workoutItem.exerciseid,
+      position: workoutItem.position,
+      amount_of_sets: workoutItem.sets.length,
+    });
+  });
+  return templateItems;
+};
+
 export const saveAsTemplateToDB = async (workout: Workout, name: string) => {
   const user = await supabase.auth.getUser();
   const userId = user.data.user?.id;
@@ -673,8 +689,6 @@ export const saveAsTemplateToDB = async (workout: Workout, name: string) => {
   if (!userId) {
     throw new Error('No user id found! User may not be logged in');
   }
-
-  const template_items: DBInsertTemplateItem[] = [];
 
   const Template: DBInsertTemplate = {
     name,
@@ -698,14 +712,10 @@ export const saveAsTemplateToDB = async (workout: Workout, name: string) => {
 
   const templateId = data.id;
 
-  workout.workout_items.forEach((workout_item) => {
-    template_items.push({
-      exercise_id: workout_item.exerciseid,
-      position: workout_item.position,
-      amount_of_sets: workout_item.sets.length,
-      template_id: templateId,
-    });
-  });
+  const template_items = workoutItemsToTemplateItems(
+    workout.workout_items,
+    templateId
+  );
 
   const { error: templateItemError } = await supabase
     .from('template_items')
@@ -791,7 +801,14 @@ export const newWorkoutFromTemplate = async (
 
   const { data, error } = await supabase
     .from('workouts')
-    .insert([{ name: 'New Workout', userid, status: 'active' }])
+    .insert([
+      {
+        name: 'New Workout',
+        userid,
+        status: 'active',
+        template_id: templateid,
+      },
+    ])
     .select('id');
 
   if (error) {
@@ -999,4 +1016,57 @@ export const deleteAllActiveWorkouts = async (userId: string) => {
     };
   }
   return { success: true, data };
+};
+
+export const getTemplate = async (templateId: number) => {
+  const { data, error } = await supabase
+    .from('templates')
+    .select('*, template_items(*)')
+    .eq('id', templateId)
+    .single();
+  if (error || !data) {
+    logger(error || 'No data');
+    return {
+      success: false,
+      error: error?.message || 'Error loading template',
+    };
+  }
+  return { success: true, data };
+};
+
+export const updateTemplateInDB = async (
+  templateId: number,
+  workout: Workout
+) => {
+  logger(templateId, 'Updating template');
+  logger(workout.userid, 'userid');
+  // Update the template in the db with anything that changed
+  const templateItems = workoutItemsToTemplateItems(
+    workout.workout_items,
+    templateId
+  );
+  // delete previous template Items
+  const { error: deleteTemplateItemsError } = await supabase
+    .from('template_items')
+    .delete()
+    .eq('template_id', templateId);
+  if (deleteTemplateItemsError) {
+    logger(deleteTemplateItemsError || 'No data');
+    return {
+      success: false,
+      error: deleteTemplateItemsError?.message || 'Error updating template',
+    };
+  }
+  // insert new template items
+  const { error: insertTemplateItemsError } = await supabase
+    .from('template_items')
+    .insert(templateItems);
+  if (insertTemplateItemsError) {
+    logger(insertTemplateItemsError || 'No data');
+    return {
+      success: false,
+      error: insertTemplateItemsError?.message || 'Error updating template',
+    };
+  }
+  return { success: true };
 };

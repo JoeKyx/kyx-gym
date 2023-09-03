@@ -15,8 +15,10 @@ import {
   getExercises,
   getFilledWorkout,
   getRecords,
+  getTemplate,
   loadPreviousSetsForWorkoutItems,
   updateSetInDB,
+  updateTemplateInDB,
   updateWorkoutInDB,
 } from '@/lib/supabase-util';
 
@@ -60,6 +62,8 @@ interface IActiveWorkoutContext {
     workout_item_id: number
   ) => Promise<{ success: boolean; message: string }>;
   deleteWorkout: () => Promise<{ success: boolean; message: string }>;
+  changedWorkoutComparedToTemplate: () => Promise<boolean>;
+  updateTemplate: () => Promise<void>;
 }
 
 const initialActiveWorkoutContext: IActiveWorkoutContext = {
@@ -100,6 +104,12 @@ const initialActiveWorkoutContext: IActiveWorkoutContext = {
     return { success: false, message: 'Error deleting workout' };
   },
   loadingExercises: null,
+  changedWorkoutComparedToTemplate: async () => {
+    return false;
+  },
+  updateTemplate: async () => {
+    return;
+  },
 };
 
 export const ActiveWorkoutContext = createContext(initialActiveWorkoutContext);
@@ -443,6 +453,40 @@ export function ActiveWorkoutProvider({
     }
   };
 
+  const changedWorkoutComparedToTemplate = async (): Promise<boolean> => {
+    if (!activeWorkout) return false;
+    if (!activeWorkout.template_id) return false;
+    const templateToCheckRes = await getTemplate(activeWorkout.template_id);
+    if (!templateToCheckRes.success) return false;
+    const templateToCheck = templateToCheckRes.data;
+    if (!templateToCheck || templateToCheck.userid !== activeWorkout.userid)
+      return false;
+    if (
+      templateToCheck.template_items.length !==
+      activeWorkout.workout_items.length
+    )
+      return true;
+    for (let i = 0; i < templateToCheck.template_items.length; i++) {
+      const templateItem = templateToCheck.template_items[i];
+      const workoutItem = activeWorkout.workout_items[i];
+      if (templateItem.exercise_id !== workoutItem.exerciseid) return true;
+      if (templateItem.amount_of_sets !== workoutItem.sets.length) return true;
+    }
+    return false;
+  };
+
+  const updateTemplate = async () => {
+    if (!activeWorkout) return;
+    if (!activeWorkout.template_id) return;
+    const updateTemplateRes = await updateTemplateInDB(
+      activeWorkout.template_id,
+      activeWorkout
+    );
+    if (!updateTemplateRes.success) {
+      setError(updateTemplateRes.error || 'Error updating template');
+    }
+  };
+
   return (
     <ActiveWorkoutContext.Provider
       value={{
@@ -463,6 +507,8 @@ export function ActiveWorkoutProvider({
         updateWorkoutName,
         finishWorkout,
         records,
+        changedWorkoutComparedToTemplate,
+        updateTemplate,
       }}
     >
       {children}

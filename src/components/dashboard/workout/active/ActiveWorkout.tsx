@@ -23,6 +23,7 @@ import { useSocial } from '@/components/context/SocialContext';
 import ActiveWorkoutSetRow from '@/components/dashboard/workout/active/ActiveWorkoutSetRow';
 import DeleteWorkoutModal from '@/components/dashboard/workout/active/DeleteWorkoutModal';
 import ProgressBar from '@/components/dashboard/workout/active/ProgressBar';
+import TemplateChangedModal from '@/components/dashboard/workout/active/TemplateChangedModal';
 import { WorkoutDuration } from '@/components/dashboard/workout/active/WorkoutDuration';
 import WorkoutNotFinishedModal from '@/components/dashboard/workout/active/WorkoutNotFinishedModal';
 import WorkoutName from '@/components/dashboard/WorkoutName';
@@ -62,6 +63,8 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
     useState<boolean>(false);
   const [showHowTo, setShowHowTo] = useState<Record<number, boolean>>({});
   const [showWorkoutNotFinishedModal, setShowWorkoutNotFinishedModal] =
+    useState<boolean>(false);
+  const [showTemplateChangedModal, setShowTemplateChangedModal] =
     useState<boolean>(false);
   const [showDeleteWorkoutModal, setShowDeleteWorkoutModal] =
     useState<boolean>(false);
@@ -166,19 +169,6 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
     setLoadingAddSet((prev) => ({ ...prev, [item.id]: false }));
   };
 
-  const handleFinishWorkout = async () => {
-    if (!workout) return;
-    if (!allSetsInWorkoutFinished()) {
-      logger('Not all sets in workout finished');
-      setShowWorkoutNotFinishedModal(true);
-      return;
-    }
-
-    setFinishedWorkoutLoading(true);
-
-    await finishWorkout();
-  };
-
   const finishWorkout = async () => {
     setShowWorkoutNotFinishedModal(false);
     playSound(finishedWorkoutSound);
@@ -193,6 +183,32 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       setFinishedWorkoutLoading(false);
       setError(res.message);
     }
+  };
+
+  const onUpdateTemplate = async () => {
+    setShowTemplateChangedModal(false);
+    await activeWorkoutContext.updateTemplate();
+    setFinishedWorkoutLoading(true);
+    await finishWorkout();
+  };
+
+  const handleFinishWorkout = async () => {
+    if (!workout) return;
+    if (!allSetsInWorkoutFinished()) {
+      logger('Not all sets in workout finished');
+      setShowWorkoutNotFinishedModal(true);
+      return;
+    }
+    const changedTemplate =
+      await activeWorkoutContext.changedWorkoutComparedToTemplate();
+    if (changedTemplate) {
+      setShowTemplateChangedModal(true);
+      return;
+    }
+
+    setFinishedWorkoutLoading(true);
+
+    await finishWorkout();
   };
 
   const onContinueWorkout = () => {
@@ -393,6 +409,11 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
         open={showDeleteWorkoutModal}
         onContinue={onContinueWorkout}
         onDelete={onDeleteWorkout}
+      />
+      <TemplateChangedModal
+        open={showTemplateChangedModal}
+        onUpdate={onUpdateTemplate}
+        onNoUpdate={() => finishWorkout()}
       />
     </div>
   );
