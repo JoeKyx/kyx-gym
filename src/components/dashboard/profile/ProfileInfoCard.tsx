@@ -103,30 +103,29 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
               <Tooltip>
                 <TooltipTrigger>
                   {' '}
-                  <svg width='100%' height='100%' viewBox='0 0 104 104'>
+                  <svg width='125' height='125' viewBox='0 0 130 130'>
                     {/* Background Circle */}
                     <circle
-                      cx='52'
-                      cy='52'
-                      r='47'
+                      cx='65'
+                      cy='65'
+                      r='60'
                       fill='none'
                       stroke='white'
                       strokeWidth='5'
                     />
                     {/* Progress Circle */}
-
                     <circle
-                      cx='52'
-                      cy='52'
-                      r='47'
+                      cx='65'
+                      cy='65'
+                      r='60'
                       fill='none'
                       stroke='#14b8a6'
                       strokeWidth='6'
-                      strokeDasharray={`${2 * Math.PI * 47}`} // Update according to the new radius
+                      strokeDasharray={`${2 * Math.PI * 60}`} // Update according to new radius (cx - strokeWidth / 2)
                       strokeDashoffset={`${
-                        2 * Math.PI * 47 * (1 - progressPercentage / 100)
+                        2 * Math.PI * 60 * (1 - progressPercentage / 100)
                       }`}
-                      transform='rotate(-90 52 52)' // Rotate the circle so the progress starts from the top
+                      transform='rotate(-90 65 65)' // Rotate the circle so progress starts from top
                       strokeLinecap='round'
                     />
                   </svg>
@@ -163,14 +162,14 @@ const ProfileInfoCard: FC<ProfileInfoCardProps> = forwardRef<
                   : '/images/avatars/default.jpeg'
               }
               alt='Profile'
-              width={125}
-              height={125}
-              className='rounded-full'
+              width={107}
+              height={107}
+              className='absolute rounded-full'
             />
             {/* Overlay */}
             {isOwn && (
               <div
-                className='absolute inset-1 z-10 flex cursor-pointer items-center justify-center rounded-full bg-black opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-50'
+                className='absolute flex h-24 w-24 cursor-pointer items-center justify-center rounded-full bg-black opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-50'
                 onClick={() => socialContext?.setShowProfilePictureModal(true)}
               >
                 <p className='font-semibold text-white'>Change</p>
