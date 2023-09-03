@@ -134,6 +134,19 @@ const MainStatsChart: FC<MainStatsChartProps> = forwardRef<
               : '',
             value1: exerciseHistory.reps ? exerciseHistory.reps : 0,
           };
+        case 'time':
+          return {
+            Name: exerciseHistory.exercise_name
+              ? exerciseHistory.exercise_name
+              : '',
+            Date: exerciseHistory.workout_finished_at
+              ? format(
+                  new Date(exerciseHistory.workout_finished_at),
+                  'MM/dd/yyyy'
+                )
+              : '',
+            value1: exerciseHistory.speed ? exerciseHistory.speed : 0,
+          };
         default:
           return {
             Name: exerciseHistory.exercise_name
@@ -154,7 +167,7 @@ const MainStatsChart: FC<MainStatsChartProps> = forwardRef<
   );
 
   const updateYAxisInfo = useCallback(
-    (typeOfExercise: 'weight' | 'speed' | 'other') => {
+    (typeOfExercise: 'weight' | 'speed' | 'other' | 'time') => {
       switch (typeOfExercise) {
         case 'weight':
           setYAxisInfo1({

@@ -1020,12 +1020,12 @@ export interface Database {
           muscle_area_name: string | null;
           muscle_id: number | null;
           muscle_name: string | null;
-          userid: string | null;
+          user_id: string | null;
         };
         Relationships: [
           {
             foreignKeyName: 'workouts_userid_fkey';
-            columns: ['userid'];
+            columns: ['user_id'];
             referencedRelation: 'userprofile';
             referencedColumns: ['userid'];
           }
@@ -1086,7 +1086,7 @@ export interface Database {
     };
     Enums: {
       date_type: 'workout';
-      exercise_type: 'weight' | 'speed' | 'other';
+      exercise_type: 'weight' | 'speed' | 'other' | 'time';
       profilefeedtype:
         | 'friendAdd'
         | 'friendRemove'

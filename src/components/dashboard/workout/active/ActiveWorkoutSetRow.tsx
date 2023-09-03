@@ -274,6 +274,33 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
             />
           </>
         )}
+        {workoutItem.exercises?.type === 'time' && (
+          <>
+            <input
+              type='text' // Change to text input
+              inputMode='decimal' // Optimize keyboard for mobile devices
+              // Allow only digits
+              placeholder='Minutes'
+              value={inputValues[set.id]?.speed || ''}
+              onChange={(e) => {
+                // Replace commas with dots, then filter the value for valid decimal inputs
+                let value = e.target.value
+                  .replace(/,/g, '.')
+                  .replace(/[^0-9.]/g, '');
+                // Only allow one dot
+                const dotIndex = value.indexOf('.');
+                if (dotIndex !== -1) {
+                  value = `${value.substring(0, dotIndex + 1)}${value
+                    .substring(dotIndex + 1)
+                    .replace(/\./g, '')}`;
+                }
+                handleInputChange(set, 'speed', value);
+              }}
+              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+              disabled={set.is_finished}
+            />
+          </>
+        )}
 
         <TypeDisplay
           className='hidden md:block'
