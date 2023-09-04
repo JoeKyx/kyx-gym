@@ -193,31 +193,43 @@ const AddExercises: FC<AddExercisesProps> = forwardRef<
       </div>
 
       <div className='flex max-h-screen flex-col gap-2 overflow-auto bg-slate-200'>
-        {filteredExercises.map((exercise) => (
-          <div
-            key={exercise.id}
-            className={cn(
-              'm-1 flex cursor-pointer rounded-md border bg-slate-50 p-2 transition-all duration-300 ease-in-out',
-              `${
-                selectedExercises.includes(exercise)
-                  ? 'bg-primary-600 border-primary-800 text-white'
-                  : 'border-primary-400 hover:bg-primary-500'
-              }`
-            )}
-            onClick={() => {
-              if (selectedExercises.includes(exercise)) {
-                unselectExercise(exercise);
-              } else {
-                selectExercise(exercise);
-              }
-            }}
-          >
-            <div className='flex flex-col'>
-              <span className='font-semibold'>{exercise.name}</span>
-              <span className='text-sm'>{exercise.description}</span>
+        {filteredExercises
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .sort(
+            (a, b) =>
+              (b.amount_of_times_performed || 0) -
+              (a.amount_of_times_performed || 0)
+          )
+          .map((exercise) => (
+            <div
+              key={exercise.id}
+              className={cn(
+                'm-1 flex cursor-pointer rounded-md border bg-slate-50 p-2 transition-all duration-300 ease-in-out',
+                `${
+                  selectedExercises.includes(exercise)
+                    ? 'bg-primary-600 border-primary-800 text-white'
+                    : 'border-primary-400 hover:bg-primary-500'
+                }`
+              )}
+              onClick={() => {
+                if (selectedExercises.includes(exercise)) {
+                  unselectExercise(exercise);
+                } else {
+                  selectExercise(exercise);
+                }
+              }}
+            >
+              <div className='flex w-full flex-col'>
+                <div className='flex w-full justify-between'>
+                  <span className='font-semibold'>{exercise.name}</span>
+                  <span className='text-sm'>
+                    {exercise.amount_of_times_performed || 0} x
+                  </span>
+                </div>
+                <span className='text-sm'>{exercise.description}</span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
       <AddNewExerciseModal
         onClose={() => setShowAddNewExerciseModal(false)}

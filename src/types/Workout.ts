@@ -58,6 +58,7 @@ export enum SetType {
 export type Exercise = DBExercise & {
   exercise_categories: DBCategory | null;
   muscles: DBMuscle[];
+  amount_of_times_performed?: number;
 };
 
 export type WorkoutItem = DBWorkoutItem & {

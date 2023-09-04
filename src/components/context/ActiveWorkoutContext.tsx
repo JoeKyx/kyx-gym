@@ -153,7 +153,7 @@ export function ActiveWorkoutProvider({
   useEffect(() => {
     if (!activeWorkout) return;
     const loadData = async () => {
-      const exercises = await getExercises();
+      const exercises = await getExercises(activeWorkout.userid);
       if (!exercises) return;
       setAvailableExercises(exercises);
     };

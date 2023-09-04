@@ -248,14 +248,36 @@ export async function getFilledWorkout(workout_id: string | number) {
   return { success: true, data: filledWorkout };
 }
 
-export async function getExercises() {
+export async function getExercises(userid?: string) {
   const { data, error } = await supabase
     .from('exercises')
     .select('*, muscles(*), exercise_categories(*)');
   if (error || !data) {
     logger(error || 'No data');
   }
-  return data;
+  if (userid) {
+    const { data: amountData, error: amountError } = await supabase
+      .from('exercise_count')
+      .select('*')
+      .eq('user_id', userid);
+    if (amountError || !amountData) {
+      logger(amountError || 'No data');
+    }
+    // Add amount of times performed to exercise
+    const exercisesWithAmount = data?.map((exercise) => {
+      const amount =
+        amountData?.find((amount) => amount.id === exercise.id)?.amount || 0;
+      return { ...exercise, amount_of_times_performed: amount };
+    });
+    return exercisesWithAmount;
+  } else {
+    // Set amount of times performed to 0
+    const exercisesWithAmount = data?.map((exercise) => {
+      return { ...exercise, amount_of_times_performed: 0 };
+    });
+
+    return exercisesWithAmount;
+  }
 }
 
 export async function getAllMuscles() {
