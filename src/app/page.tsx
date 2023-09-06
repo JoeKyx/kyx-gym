@@ -33,20 +33,18 @@ export default function HomePage() {
   };
 
   return (
-    <div className='overflow-x-hidden'>
-      <div className='relative h-screen w-screen overflow-x-hidden bg-black'>
-        <Image
-          src='/images/bg/ancient_ninja_gym_2.jpeg'
-          layout='fill'
-          objectFit='cover'
-          alt='Background Image'
-          className='z-0 opacity-40'
-        />
+    <>
+      <div
+        className='relative z-20 h-screen w-full bg-black bg-opacity-60'
+        style={{
+          backgroundImage: `url('/images/bg/ancient_ninja_gym_2.jpeg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className='absolute inset-0 -z-10 bg-black bg-opacity-60'></div>
 
-        <main
-          className='relative z-20 mx-5 flex flex-col items-center'
-          ref={loginRef}
-        >
+        <main className='flex h-full flex-col items-center' ref={loginRef}>
           {!isProd && (
             <span className='text-white'>
               Are we prod? {isProd ? 'Yes' : 'No'}
@@ -67,9 +65,9 @@ export default function HomePage() {
           </div>
         </main>
       </div>
-      <div ref={infoRef} className='h-screen'>
+      <div ref={infoRef}>
         <Information refToScroll={loginRef} />
       </div>
-    </div>
+    </>
   );
 }

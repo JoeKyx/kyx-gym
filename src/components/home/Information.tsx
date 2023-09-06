@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { animated, useInView, useTransition } from 'react-spring';
 import { useSwipeable } from 'react-swipeable';
 
@@ -104,6 +104,9 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0); // 0: next, 1: prev
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const infoTopRef = useRef<HTMLDivElement>(null!);
+
   const [ref, springs] = useInView(
     () => ({
       from: {
@@ -133,10 +136,96 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
       },
     }),
     {
-      rootMargin: '0px 0px -30% 0px',
+      rootMargin: '-40% 0%',
       once: true,
     }
   );
+
+  // desktop springs
+  const [refPart1, springsPart1] = useInView(
+    () => ({
+      from: {
+        opacity: 0,
+        x: -120,
+      },
+      to: {
+        opacity: 1,
+        x: 0,
+      },
+    }),
+    {
+      rootMargin: '-40% 0%',
+    }
+  );
+
+  const [refPart2, springsPart2] = useInView(
+    () => ({
+      from: {
+        opacity: 0,
+        x: -120,
+      },
+      to: {
+        opacity: 1,
+        x: 0,
+      },
+    }),
+    {
+      rootMargin: '-40% 0%',
+    }
+  );
+
+  const [refPart3, springsPart3] = useInView(
+    () => ({
+      from: {
+        opacity: 0,
+        x: -120,
+      },
+      to: {
+        opacity: 1,
+        x: 0,
+      },
+    }),
+    {
+      rootMargin: '-50% 0%',
+    }
+  );
+
+  const getMostVisibleSection = useCallback(() => {
+    if (!refPart1.current || !refPart2.current || !refPart3.current) {
+      return;
+    }
+
+    const offsets = [
+      refPart1.current.getBoundingClientRect().top,
+      refPart2.current.getBoundingClientRect().top,
+      refPart3.current.getBoundingClientRect().top,
+    ];
+
+    // Getting the absolute values because we are interested in the distance from the top of the viewport
+    const absoluteOffsets = offsets.map(Math.abs);
+
+    // Find the minimum value
+    const minOffset = Math.min(...absoluteOffsets);
+
+    // Return the index of the section with the smallest offset
+    return absoluteOffsets.indexOf(minOffset);
+  }, [refPart1, refPart2, refPart3]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const visibleIndex = getMostVisibleSection();
+      if (visibleIndex !== undefined) {
+        setIndex(visibleIndex);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Cleanup the listener when the component is unmounted
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [getMostVisibleSection]);
 
   const transitions = useTransition(images[index] ?? null, {
     from: {
@@ -175,11 +264,26 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
     onSwipedRight: () => prev(),
   });
 
+  const scrollToPart = (i: number) => {
+    switch (i) {
+      case 0:
+        refPart1.current?.scrollIntoView({ behavior: 'smooth' });
+        break;
+      case 1:
+        refPart2.current?.scrollIntoView({ behavior: 'smooth' });
+        break;
+      case 2:
+        refPart3.current?.scrollIntoView({ behavior: 'smooth' });
+        break;
+    }
+  };
+
   return (
     <>
       <div
         className='relative h-full bg-black bg-opacity-60 md:hidden'
         {...swipeHandlers}
+        ref={infoTopRef}
       >
         <Image
           src='/images/bg/ancient_ninja_gym.jpeg'
@@ -257,84 +361,110 @@ const Information: FC<InformationProps> = ({ refToScroll }) => {
       </div>
 
       {/* Desktop view */}
-      <div className='relative hidden h-full bg-black bg-opacity-60 md:block'>
-        <Image
-          src='/images/bg/ancient_ninja_gym.jpeg'
-          layout='fill'
-          objectFit='cover'
-          alt='Background Image'
-          className='-z-20'
-        />
-        <div className='flex h-full  items-center'>
-          <div className='flex h-full w-full flex-col items-center justify-between pb-8 pt-28'>
-            <div className='flex h-5/6 w-full'>
-              {/* Image container */}
-              <div
-                className={`flex w-1/3 flex-col items-center justify-center transition-opacity duration-300 `}
-              >
-                {images.map((image, i) => (
-                  <Image
-                    key={image.title}
-                    src={image.src}
-                    className={`absolute ${
-                      index === i ? 'opacity-100' : 'opacity-0'
-                    } transition-opacity duration-500`}
-                    width={250}
-                    height={400}
-                    alt='App Screenshot'
-                    priority
-                    placeholder='empty'
-                  />
-                ))}
-              </div>
-
-              {/* Text container */}
-              <div className='flex w-1/3 flex-col items-center justify-between transition-opacity duration-300'>
-                <div></div>
-                {images.map((image, i) => (
-                  <div
-                    className={`absolute ${
-                      index === i ? 'z-10 opacity-100' : '-z-10 opacity-0'
-                    } w-1/3 transition-opacity duration-500`}
-                    key={image.title}
-                  >
-                    <h2 className='font-bold text-white drop-shadow'>
-                      {image.title}
-                    </h2>
-                    <div className='text-white'>{image.element}</div>
-                  </div>
-                ))}
-                <div className='flex flex-col items-center gap-3'>
-                  <span className='text-center text-white'>
-                    Do you have what it takes to become a Kyx Ninja?{' '}
-                  </span>
-                  <Button onClick={handleJoinNowClick}>Join Now!</Button>
+      {/* Put dark filter over bg image */}
+      <div
+        className='relative z-20 hidden h-full bg-black bg-opacity-60 md:flex'
+        ref={infoTopRef}
+        style={{
+          backgroundImage: `url('/images/bg/ancient_ninja_gym.jpeg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+        }}
+      >
+        <div className='absolute inset-0 -z-10 bg-black bg-opacity-60'></div>
+        <div className='flex items-start justify-between'>
+          <main className='w-2/3'>
+            <animated.div
+              ref={refPart1}
+              style={springsPart1}
+              className='flex h-screen w-full items-center justify-between pl-20'
+              key={images[0].title}
+            >
+              <div className='flex items-center gap-24'>
+                <Image
+                  src={images[0].src}
+                  width={250}
+                  height={400}
+                  alt='App Screenshot'
+                  priority
+                  placeholder='empty'
+                />
+                <div>
+                  <h2 className='font-bold text-white drop-shadow'>
+                    {images[0].title}
+                  </h2>
+                  <div className='text-white'>{images[2].element}</div>
                 </div>
               </div>
-
-              {/* Menu */}
-              <div className='flex w-1/3 cursor-pointer flex-col items-center gap-8'>
-                {images.map((image, i) => (
-                  <div
-                    key={image.title}
-                    className='relative flex h-16 w-full transform items-center justify-end overflow-hidden rounded-lg p-5 transition duration-200 ease-in-out hover:scale-105'
-                    onClick={() => setIndex(i)}
-                  >
-                    {/* Gradient Overlay */}
-                    <div
-                      className={`transition-width absolute inset-y-0 right-0 bg-gradient-to-r from-transparent to-red-900 duration-500 ${
-                        i === index ? 'w-full' : 'w-0'
-                      }`}
-                    ></div>
-
-                    <span className='relative font-bold uppercase tracking-wider text-white'>
-                      {image.title}
-                    </span>
-                  </div>
-                ))}
+            </animated.div>
+            <animated.div
+              ref={refPart2}
+              style={springsPart2}
+              className='flex h-screen w-full items-center justify-between pl-20'
+              key={images[1].title}
+            >
+              <div className='flex items-center gap-24'>
+                <Image
+                  src={images[1].src}
+                  width={250}
+                  height={400}
+                  alt='App Screenshot'
+                  priority
+                  placeholder='empty'
+                />
+                <div>
+                  <h2 className='font-bold text-white drop-shadow'>
+                    {images[1].title}
+                  </h2>
+                  <div className='text-white'>{images[1].element}</div>
+                </div>
               </div>
-            </div>
-          </div>
+            </animated.div>{' '}
+            <animated.div
+              ref={refPart3}
+              style={springsPart3}
+              className='flex h-screen w-full items-center justify-between pl-20'
+              key={images[2].title}
+            >
+              <div className='flex items-center gap-24'>
+                <Image
+                  src={images[2].src}
+                  width={250}
+                  height={400}
+                  alt='App Screenshot'
+                  priority
+                  placeholder='empty'
+                />
+                <div>
+                  <h2 className='font-bold text-white drop-shadow'>
+                    {images[2].title}
+                  </h2>
+                  <div className='text-white'>{images[2].element}</div>
+                </div>
+              </div>
+            </animated.div>
+          </main>
+          <aside className='sticky top-0 pt-72'>
+            {images.map((image, i) => (
+              // onClick Scroll to the section
+              <div
+                key={image.title}
+                className='relative flex h-16 w-full transform cursor-pointer items-center justify-end overflow-hidden rounded-lg p-5 transition duration-200 ease-in-out hover:scale-95'
+                onClick={() => scrollToPart(i)}
+              >
+                <animated.div
+                  className={`transition-width absolute inset-y-0 right-0 bg-gradient-to-r from-transparent to-red-900 duration-500 ${
+                    i === index ? 'w-full' : 'w-0'
+                  }`}
+                ></animated.div>
+
+                <span className='relative font-bold uppercase tracking-wider text-white'>
+                  {image.title}
+                </span>
+              </div>
+            ))}
+          </aside>
         </div>
       </div>
     </>

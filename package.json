@@ -58,6 +58,7 @@
     "react-hydration-provider": "^1.0.2",
     "react-icons": "^4.10.1",
     "react-intersection-observer": "^9.5.2",
+    "react-scroll-parallax": "^3.4.2",
     "react-spring": "^9.7.2",
     "react-swipeable": "^7.0.1",
     "recharts": "^2.8.0",
