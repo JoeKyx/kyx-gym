@@ -128,7 +128,7 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
               )}
 
               {(!advice ||
-                differenceInDays(new Date(advice.created_at), new Date()) >
+                differenceInDays(new Date(), new Date(advice.created_at)) >
                   3) &&
               profileContext.isOwn ? (
                 <Button
@@ -144,7 +144,7 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
                   <div className='mt-2 flex flex-col'>
                     <p className='text-sm text-gray-500'>
                       Generated{' '}
-                      {formatDistance(new Date(advice.created_at), new Date())}{' '}
+                      {formatDistance(new Date(), new Date(advice.created_at))}{' '}
                       ago
                     </p>
                     <p className='text-sm text-gray-500'>

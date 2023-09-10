@@ -69,17 +69,26 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
   const isHighestInWorkoutItem = (field: 'weight' | 'volume'): boolean => {
     if (!set.is_finished) return false;
     if (field === 'weight') {
+      logger(workoutItem.sets, 'workoutItem.sets');
       // Get the max weight set in the workout item with the lowest finished_at Date (if not exists then lowest id) and that has is_finished = true
       const maxWeightSet = workoutItem.sets
         .filter((item) => item.is_finished)
         .reduce((prev, current) => {
+          logger(prev, 'prev');
+          logger(current, 'current');
           if (prev.is_finished !== true || !prev.weight || !prev.reps)
             return current;
           if (current.is_finished !== true || !current.weight || !current.reps)
             return prev;
 
-          if (prev.weight > current.weight) return prev;
-          if (prev.weight < current.weight) return current;
+          if (prev.weight > current.weight) {
+            logger(prev, 'prev');
+            return prev;
+          }
+          if (prev.weight < current.weight) {
+            logger(current, 'current');
+            return current;
+          }
 
           // If volumes are equal, compare finished_at
           if (prev.finished_at && current.finished_at) {
