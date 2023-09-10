@@ -44,10 +44,10 @@ const page: FC = () => {
             height={250}
             alt='logo of Kyx Gym'
           />
-          <h1 className='font-poppins text-4xl font-bold'>
+          <h1 className='font-poppins text-center text-4xl font-bold'>
             Focus on your Workout
           </h1>
-          <h1 className='font-poppins text-5xl font-bold'>
+          <h1 className='font-poppins text-center text-5xl font-bold'>
             Let <span className='text-primary-500'>Kyx</span> do the rest
           </h1>
         </div>
