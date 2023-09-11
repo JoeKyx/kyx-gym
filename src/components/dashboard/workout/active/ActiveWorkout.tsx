@@ -298,104 +298,106 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       <div className='h-4/6 overflow-auto'>
         {' '}
         {/* Add a specific height or max-height */}
-        {workout.workout_items.map((item, index) => (
-          <div
-            key={index}
-            className='mb-4 rounded-lg bg-white p-4 shadow-md md:p-4'
-          >
-            <div className='flex items-center justify-between'>
-              <div className='flex gap-2'>
-                <span className='text-primary-500 font-semibold'>
-                  {item.exercises?.name}
-                  {allSetsFinished(item.sets) && <>{' - Done '}</>}
-                </span>
-                <div className='md:hidden'>
-                  <Popover>
-                    <PopoverTrigger>
-                      <HelpCircle className='text-primary cursor-pointer' />
-                    </PopoverTrigger>
-                    <PopoverContent>{item.exercises?.howto}</PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              <div className='flex items-start'>
-                <MuscleAndCategory
-                  className='hidden gap-3 md:flex'
-                  item={item}
-                />
-
-                <IconButton
-                  icon={X}
-                  variant='outline'
-                  className='ml-2 hover:bg-red-400 hover:text-white'
-                  onClick={() =>
-                    activeWorkoutContext.deleteWorkoutItem(item.id)
-                  }
-                />
-              </div>
-            </div>
-            <div className='flex w-full flex-col md:flex-row'>
-              <div className='flex w-full flex-col md:w-1/2'>
-                {item.sets
-                  .sort((a, b) => (a.position || 0) - (b.position || 0))
-                  .map((set, setIndex) => (
-                    <React.Fragment key={setIndex}>
-                      <ActiveWorkoutSetRow
-                        set={set}
-                        setIndex={setIndex}
-                        inputValues={inputValues}
-                        handleInputChange={handleInputChange}
-                        handleSetTypeChange={handleSetTypeChange}
-                        handleSetFinish={handleSetFinish}
-                        workoutItem={item}
-                      />
-                    </React.Fragment>
-                  ))}
-                <div className='mt-4 flex justify-start'>
-                  <Button
-                    variant='primary'
-                    onClick={() => handleAddSet(item)}
-                    className='text-center'
-                    disabled={loadingAddSet[item.id]} // Disable the button while loading
-                  >
-                    {loadingAddSet[item.id] ? (
-                      <Loader2Icon className='animate-spin' /> // Show loading spinner
-                    ) : (
-                      'Add Set'
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <div className='ml-5 mt-2 hidden w-3/5 md:block'>
-                <div className='flex h-full flex-col justify-between'>
-                  <div className='flex flex-col'>
-                    <span className='text-primary font-semibold'>
-                      {showHowTo[item.id] ? 'How to' : 'Description'}
-                    </span>
-                    <span className='shadow-sm'>
-                      {showHowTo[item.id]
-                        ? item.exercises?.howto
-                        : item.exercises?.description}
-                    </span>
+        {workout.workout_items
+          .sort((a, b) => a.position - b.position)
+          .map((item, index) => (
+            <div
+              key={index}
+              className='mb-4 rounded-lg bg-white p-4 shadow-md md:p-4'
+            >
+              <div className='flex items-center justify-between'>
+                <div className='flex gap-2'>
+                  <span className='text-primary-500 font-semibold'>
+                    {item.exercises?.name}
+                    {allSetsFinished(item.sets) && <>{' - Done '}</>}
+                  </span>
+                  <div className='md:hidden'>
+                    <Popover>
+                      <PopoverTrigger>
+                        <HelpCircle className='text-primary cursor-pointer' />
+                      </PopoverTrigger>
+                      <PopoverContent>{item.exercises?.howto}</PopoverContent>
+                    </Popover>
                   </div>
-                  <Button
-                    variant='primary'
-                    leftIcon={HelpCircle}
+                </div>
+                <div className='flex items-start'>
+                  <MuscleAndCategory
+                    className='hidden gap-3 md:flex'
+                    item={item}
+                  />
+
+                  <IconButton
+                    icon={X}
+                    variant='outline'
+                    className='ml-2 hover:bg-red-400 hover:text-white'
                     onClick={() =>
-                      setShowHowTo((prev) => ({
-                        ...prev,
-                        [item.id]: !prev[item.id],
-                      }))
+                      activeWorkoutContext.deleteWorkoutItem(item.id)
                     }
-                    className='mt-auto text-center'
-                  >
-                    {showHowTo[item.id] ? 'Description' : 'How to'}
-                  </Button>
+                  />
+                </div>
+              </div>
+              <div className='flex w-full flex-col md:flex-row'>
+                <div className='flex w-full flex-col md:w-1/2'>
+                  {item.sets
+                    .sort((a, b) => (a.position || 0) - (b.position || 0))
+                    .map((set, setIndex) => (
+                      <React.Fragment key={setIndex}>
+                        <ActiveWorkoutSetRow
+                          set={set}
+                          setIndex={setIndex}
+                          inputValues={inputValues}
+                          handleInputChange={handleInputChange}
+                          handleSetTypeChange={handleSetTypeChange}
+                          handleSetFinish={handleSetFinish}
+                          workoutItem={item}
+                        />
+                      </React.Fragment>
+                    ))}
+                  <div className='mt-4 flex justify-start'>
+                    <Button
+                      variant='primary'
+                      onClick={() => handleAddSet(item)}
+                      className='text-center'
+                      disabled={loadingAddSet[item.id]} // Disable the button while loading
+                    >
+                      {loadingAddSet[item.id] ? (
+                        <Loader2Icon className='animate-spin' /> // Show loading spinner
+                      ) : (
+                        'Add Set'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                <div className='ml-5 mt-2 hidden w-3/5 md:block'>
+                  <div className='flex h-full flex-col justify-between'>
+                    <div className='flex flex-col'>
+                      <span className='text-primary font-semibold'>
+                        {showHowTo[item.id] ? 'How to' : 'Description'}
+                      </span>
+                      <span className='shadow-sm'>
+                        {showHowTo[item.id]
+                          ? item.exercises?.howto
+                          : item.exercises?.description}
+                      </span>
+                    </div>
+                    <Button
+                      variant='primary'
+                      leftIcon={HelpCircle}
+                      onClick={() =>
+                        setShowHowTo((prev) => ({
+                          ...prev,
+                          [item.id]: !prev[item.id],
+                        }))
+                      }
+                      className='mt-auto text-center'
+                    >
+                      {showHowTo[item.id] ? 'Description' : 'How to'}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
         {[...Array(activeWorkoutContext.loadingExercises)].map((_, i) => (
           <Skeleton key={i} className='h-40 w-full' />
         ))}
