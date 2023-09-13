@@ -23,7 +23,7 @@ export default async function RootLayout({
 
   if (!session) {
     // this is a protected route - only users who are signed in can view this route
-    redirect('/');
+    redirect('/login');
   }
 
   return (
