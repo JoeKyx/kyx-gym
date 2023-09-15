@@ -63,6 +63,7 @@ export async function getAdviceForUser(
       role: 'user',
       content: JSON.stringify(openAIWorkouts),
     });
+    logger(params, 'params');
     const completion = (await openai.chat.completions.create(params, {
       stream: false,
     })) as OpenAI.Chat.ChatCompletion;
