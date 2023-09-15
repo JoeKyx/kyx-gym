@@ -95,7 +95,7 @@ const HistoryChart: FC<HistoryChartProps> = forwardRef<
       <Title className='text-center font-semibold'>
         Last {lastWorkouts.length} Workouts
       </Title>
-      <div className='flex justify-between'>
+      <div className='flex flex-col items-center justify-between gap-4 md:flex-row'>
         <div className='flex items-center justify-center space-x-4'>
           <button
             className={`w-20 rounded-md px-2 py-1 ${
@@ -130,6 +130,7 @@ const HistoryChart: FC<HistoryChartProps> = forwardRef<
         </div>
 
         <ButtonLink
+          className='items-center'
           href={`/dashboard/profile/${profileContext.userProfile?.username}/stats`}
         >
           Advanced Stats

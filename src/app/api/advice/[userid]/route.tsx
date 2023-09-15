@@ -36,6 +36,7 @@ export async function GET(
     .from('ai_advice')
     .select('*')
     .order('created_at', { ascending: false })
+    .eq('user_id', userid)
     .limit(1);
   if (prevAdviceError) {
     logger(prevAdviceError, 'error');
