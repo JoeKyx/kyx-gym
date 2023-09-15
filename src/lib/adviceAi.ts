@@ -5,7 +5,10 @@ import logger from '@/lib/logger';
 
 import { Database } from '@/types/supabase';
 import { Workout } from '@/types/Workout';
-const openai = new OpenAI({ apiKey: process.env.NEXT_OPEN_AI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_OPEN_AI_API_KEY,
+  maxRetries: 5,
+});
 
 type OpenAiWorkout = {
   name: string;
@@ -63,7 +66,8 @@ export async function getAdviceForUser(
       role: 'user',
       content: JSON.stringify(openAIWorkouts),
     });
-    logger(params, 'params');
+    logger(openai, 'openai');
+
     const completion = await openai.chat.completions.create(params, {
       stream: false,
     });
