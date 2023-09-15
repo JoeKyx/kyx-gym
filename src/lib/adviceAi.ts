@@ -64,11 +64,12 @@ export async function getAdviceForUser(
       content: JSON.stringify(openAIWorkouts),
     });
     logger(params, 'params');
-    const completion = (await openai.chat.completions.create(params, {
+    const completion = await openai.chat.completions.create(params, {
       stream: false,
-    })) as OpenAI.Chat.ChatCompletion;
-    logger(completion, 'completion');
-    return completion.choices[0].message.content;
+    });
+    const castedCompletion = completion as OpenAI.Chat.ChatCompletion;
+    logger(castedCompletion, 'completion');
+    return castedCompletion.choices[0].message.content;
   } catch (error) {
     logger(error, 'error');
     return 'Sorry, I am not feeling well today. Please try again later.';
