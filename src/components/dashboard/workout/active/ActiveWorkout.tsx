@@ -271,7 +271,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
                 <span>Running for: </span>
                 <WorkoutDuration createdAt={workout.created_at} />
               </div>
-              <span>Weight lifted so far: {totalWeight} kg</span>
+              <span>Weight lifted so far: {totalWeight.toFixed(2)} kg</span>
               {error && <span className='text-red-500'>{error}</span>}
             </div>
           </div>
