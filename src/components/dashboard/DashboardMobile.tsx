@@ -128,7 +128,6 @@ const DashboardMobile: FC<DashboardMobileProps> = forwardRef<
             <User size={20} />
             <span>Profile</span>
           </Tabs.Trigger>
-          w
           <Tabs.Trigger
             className='text-mauve11 hover:text-violet11 data-[state=active]:text-primary-500 flex h-[45px] flex-1 cursor-default select-none items-center justify-center gap-2 bg-white px-5 text-[15px] leading-none outline-none  data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current data-[state=active]:focus:relative data-[state=active]:focus:shadow-[0_0_0_2px] data-[state=active]:focus:shadow-black'
             value='workouts'
