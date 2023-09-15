@@ -56,17 +56,22 @@ export async function getAdviceForUser(
 
   // Convert workouts to OpenAI format
   const openAIWorkouts = workouts.map((workout) => workoutToOpenAI(workout));
-
+  logger('Awaiting OpenAI');
   // Get advice from OpenAI
-  params.messages.push({
-    role: 'user',
-    content: JSON.stringify(openAIWorkouts),
-  });
-  const completion = (await openai.chat.completions.create(params, {
-    stream: false,
-  })) as OpenAI.Chat.ChatCompletion;
-  logger(completion, 'completion');
-  return completion.choices[0].message.content;
+  try {
+    params.messages.push({
+      role: 'user',
+      content: JSON.stringify(openAIWorkouts),
+    });
+    const completion = (await openai.chat.completions.create(params, {
+      stream: false,
+    })) as OpenAI.Chat.ChatCompletion;
+    logger(completion, 'completion');
+    return completion.choices[0].message.content;
+  } catch (error) {
+    logger(error, 'error');
+    return 'Sorry, I am not feeling well today. Please try again later.';
+  }
 }
 
 const workoutToOpenAI = (workout: Workout) => {
