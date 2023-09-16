@@ -25,7 +25,7 @@ type OpenAiWorkout = {
   }[];
 };
 
-const params: OpenAI.Chat.CompletionCreateParams = {
+const params: OpenAI.Chat.CompletionCreateParamsStreaming = {
   messages: [
     {
       role: 'system',
@@ -34,6 +34,7 @@ const params: OpenAI.Chat.CompletionCreateParams = {
     },
   ],
   model: 'gpt-4',
+  stream: true as const,
 };
 
 export async function getAdviceForUser(
@@ -50,12 +51,10 @@ export async function getAdviceForUser(
     .eq('userid', userid)
     .eq('status', 'finished')
     .order('finished_at', { ascending: false })
-    .limit(5);
+    .limit(10);
   if (error) {
     throw error;
   }
-  // Get last 5 workouts for user
-  logger(workouts, 'workouts');
 
   // Convert workouts to OpenAI format
   const openAIWorkouts = workouts.map((workout) => workoutToOpenAI(workout));
@@ -68,15 +67,11 @@ export async function getAdviceForUser(
     });
     logger(openai, 'openai');
 
-    const completion = await openai.chat.completions.create(params, {
-      stream: false,
-    });
-    const castedCompletion = completion as OpenAI.Chat.ChatCompletion;
-    logger(castedCompletion, 'completion');
-    return castedCompletion.choices[0].message.content;
+    const completion = await openai.chat.completions.create(params);
+    return completion;
   } catch (error) {
     logger(error, 'error');
-    return 'Sorry, I am not feeling well today. Please try again later.';
+    throw error;
   }
 }
 

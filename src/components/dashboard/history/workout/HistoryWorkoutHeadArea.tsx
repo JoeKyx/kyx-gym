@@ -79,7 +79,7 @@ const HistoryWorkoutHeadArea: FC<HistoryWorkoutHeadAreaProps> = forwardRef<
     setLoadingSaveAsTemplate(true);
     const template = await saveAsTemplateToDB(
       workout,
-      workout.name + ' Template'
+      workoutName + ' Template'
     );
     if (template.error) {
       setError(template.error);

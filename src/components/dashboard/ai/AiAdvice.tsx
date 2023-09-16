@@ -25,8 +25,11 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
     const profileContext = useProfile();
 
     const [advice, setAdvice] = useState<Advice | null>(null);
+    const [adviceText, setAdviceText] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [writing, setWriting] = useState<boolean>(false);
+    const [generated, setGenerated] = useState<boolean>(false);
 
     const getAdvice = useCallback(async () => {
       if (profileContext?.workouts?.length >= 3) {
@@ -46,6 +49,7 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
           }
         } else {
           setAdvice(data);
+          setAdviceText(formattedAdvice(data?.advice));
           setLoading(false);
         }
       }
@@ -56,12 +60,13 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
     }, [getAdvice]);
 
     // line breaks to <br> and ** to <strong>
-    const formattedAdvice = () => {
-      if (advice?.advice) {
+    const formattedAdvice = (text: string) => {
+      if (text) {
         // replace line breaks
-        let formatted = advice.advice.replace(/\n/g, '<br>');
+        let formatted = text.replace(/\n/g, '<br>');
         // Text between **<text>** is bold
         formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        logger(formatted, 'formatted');
         return formatted;
       }
       return '';
@@ -75,17 +80,24 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
     const generateAdvice = async () => {
       setLoading(true);
       const res = await fetch(
-        `/api/advice/${profileContext?.userProfile?.userid}`,
+        `/api/advice/${profileContext.userProfile.userid}`,
         {
           method: 'GET',
         }
       );
-      if (res.status === 200) {
-        getAdvice();
-      } else {
-        logger(res, 'error');
-        setError(res.statusText);
+      // body is a stream, content-type is text/plain charset=utf-8. Read the stream chunk by chunk and write to adviceText
+      const reader = res.body?.getReader();
+      let adviceTextFromStream = '';
+      let chunk = await reader?.read();
+      setLoading(false);
+      setWriting(true);
+      while (chunk?.done === false) {
+        adviceTextFromStream += new TextDecoder('utf-8').decode(chunk?.value);
+        chunk = await reader?.read();
+        setAdviceText(formattedAdvice(adviceTextFromStream));
       }
+      setWriting(false);
+      setGenerated(true);
     };
 
     return (
@@ -118,11 +130,11 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
                 </div>
               )}
 
-              {advice?.advice && !loading && (
+              {adviceText && !loading && (
                 <div className='flex flex-grow  overflow-y-auto py-2'>
                   <p
                     className='text-sm text-gray-900'
-                    dangerouslySetInnerHTML={{ __html: formattedAdvice() }}
+                    dangerouslySetInnerHTML={{ __html: adviceText }}
                   ></p>
                 </div>
               )}
@@ -130,7 +142,9 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
               {(!advice ||
                 differenceInDays(new Date(), new Date(advice.created_at)) >
                   3) &&
-              profileContext.isOwn ? (
+              profileContext.isOwn &&
+              !writing &&
+              !generated ? (
                 <Button
                   className='mt-4'
                   isLoading={loading}

@@ -825,7 +825,10 @@ export const newWorkoutFromTemplate = async (
     .from('workouts')
     .insert([
       {
-        name: 'New Workout',
+        name:
+          template.name +
+          ' - ' +
+          formatISO(new Date(), { representation: 'date', format: 'basic' }),
         userid,
         status: 'active',
         template_id: templateid,

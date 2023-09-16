@@ -1,4 +1,5 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { differenceInDays } from 'date-fns';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -8,6 +9,7 @@ import logger from '@/lib/logger';
 
 import { Database } from '@/types/supabase';
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 export async function GET(
   request: Request,
@@ -60,29 +62,22 @@ export async function GET(
   if (daysSincePrevAdvice > 3) {
     // Generate new advice
     try {
-      const advice = await getAdviceForUser(supabase, userid);
-      if (advice === null) {
-        logger('advice is null', 'error');
-        return NextResponse.json({
-          status: 500,
-          body: JSON.stringify({
-            error: 'Sorry, Kyx AI has some problems. Try again later. (Code 2)',
-          }),
-        });
-      }
-      const { error } = await supabase
-        .from('ai_advice')
-        .insert([{ user_id: userid, advice }]);
-      logger('done');
-      if (error) {
-        logger(error, 'error');
-        return NextResponse.json({
-          status: 500,
-          body: JSON.stringify({ error }),
-        });
-      }
-      logger('returning 200');
-      return NextResponse.json({ status: 200 });
+      const adviceStream = await getAdviceForUser(supabase, userid);
+      const stream = OpenAIStream(adviceStream, {
+        onCompletion: async (completion) => {
+          logger(completion, 'completion');
+          const { error } = await supabase.from('ai_advice').insert([
+            {
+              user_id: userid,
+              advice: completion,
+            },
+          ]);
+          if (error) {
+            logger(error, 'error');
+          }
+        },
+      });
+      return new StreamingTextResponse(stream);
     } catch (e) {
       logger(e, 'error');
       return NextResponse.json({
