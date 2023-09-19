@@ -72,7 +72,7 @@ const FakeStatsRadar: FC<FakeStatsRadarProps> = forwardRef<
       {...rest}
     >
       <ResponsiveContainer height={400} width={500}>
-        <RadarChart outerRadius={150} width={500} height={500} data={data}>
+        <RadarChart outerRadius={150} height={400} data={data}>
           <PolarGrid />
           <PolarAngleAxis dataKey='name' />
           <PolarRadiusAxis />
