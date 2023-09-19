@@ -4,8 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
 
+import FakeAiResponse from '@/components/home/FakeAiResponse';
 import FakeStatsRadar from '@/components/home/FakeStatsRadar';
 import Navbar from '@/components/home/Navbar';
+import WorkoutAccordion from '@/components/home/WorkoutAccordion';
 import ButtonLink from '@/components/links/ButtonLink';
 
 export const metadata: Metadata = {
@@ -79,7 +81,8 @@ const page: FC = () => {
                 src={feature.image}
                 fill
                 alt={feature.name}
-                className='absolute inset-0 h-full w-full object-cover'
+                sizes='400px'
+                className='absolute object-cover'
               />
               <h2 className='font-poppins absolute bottom-0 right-2 text-left text-2xl font-bold text-white'>
                 {feature.name}
@@ -137,7 +140,7 @@ const page: FC = () => {
         id='challenges'
       >
         <div className='flex w-full flex-col items-center md:w-1/3 '>
-          <h1 className='font-poppins text-center text-5xl font-bold drop-shadow-lg md:pt-0 '>
+          <h1 className='font-poppins text-center text-5xl font-bold md:pt-0 '>
             Challenges
           </h1>
           <p className='text-2xl font-semibold'>
@@ -218,6 +221,18 @@ const page: FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div
+        className='flex w-full flex-col items-center justify-center bg-slate-200 pt-40 md:pt-24'
+        id='ai'
+      >
+        <h1 className='font-poppins pb-10 text-center text-5xl font-bold md:pb-20'>
+          Experience <span className='text-primary-500'>Kyx</span>AI
+        </h1>
+        <div className='flex w-4/5 flex-col gap-20 md:flex-row'>
+          <WorkoutAccordion className='md:w-1/3' />
+          <FakeAiResponse className='md:w-2/3' />
         </div>
       </div>
       <div

@@ -1,5 +1,5 @@
 'use client';
-import { FC, forwardRef, useState } from 'react';
+import { FC, forwardRef, useEffect, useState } from 'react';
 import { HTMLAttributes } from 'react';
 import {
   PolarAngleAxis,
@@ -20,6 +20,12 @@ const FakeStatsRadar: FC<FakeStatsRadarProps> = forwardRef<
   FakeStatsRadarProps
 >((props, ref) => {
   const { className, ...rest } = props;
+
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   const [data, _setData] = useState([
     {
@@ -51,6 +57,10 @@ const FakeStatsRadar: FC<FakeStatsRadarProps> = forwardRef<
       count: 0,
     },
   ]);
+
+  if (!hydrated) {
+    return null;
+  }
 
   return (
     <div
