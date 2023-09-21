@@ -203,6 +203,8 @@ export async function getFilledWorkout(workout_id: string | number) {
     .eq('id', workout_id)
     .single();
 
+  logger(data, 'filled Workout');
+
   if (error || !data) {
     return { success: false, error: error?.message || 'Error getting workout' };
   }
@@ -883,34 +885,36 @@ export const newWorkoutFromTemplate = async (
 
   const workoutItems = workoutItemData || [];
 
-  workoutItems.forEach(async (workoutItem) => {
-    const sets: DBInsertSet[] = [];
-    const template_item = template.template_items.find(
-      (template_item) => template_item.exercise?.id === workoutItem.exerciseid
-    );
-    if (!template_item) {
-      throw new Error('No template item found');
-    }
-    const amountOfSet = template_item.amount_of_sets || 3;
-    for (let i = 0; i < amountOfSet; i++) {
-      sets.push({
-        userid: userid,
-        workout_item_id: workoutItem.id,
-        is_finished: false,
-        workout_id: workout_id,
-      });
-    }
-    const { error: setsError } = await supabase
-      .from('sets')
-      .insert(sets.flat());
-    if (setsError) {
-      logger(setsError || 'No sets id returned');
-      return {
-        success: false,
-        error: setsError?.message || 'Error creating new workout',
-      };
-    }
-  });
+  await Promise.all(
+    workoutItems.map(async (workoutItem) => {
+      const sets: DBInsertSet[] = [];
+      const template_item = template.template_items.find(
+        (template_item) => template_item.exercise?.id === workoutItem.exerciseid
+      );
+      if (!template_item) {
+        throw new Error('No template item found');
+      }
+      const amountOfSet = template_item.amount_of_sets || 3;
+      for (let i = 0; i < amountOfSet; i++) {
+        sets.push({
+          userid: userid,
+          workout_item_id: workoutItem.id,
+          is_finished: false,
+          workout_id: workout_id,
+        });
+      }
+      const { error: setsError } = await supabase
+        .from('sets')
+        .insert(sets.flat());
+      if (setsError) {
+        logger(setsError || 'No sets id returned');
+        return {
+          success: false,
+          error: setsError?.message || 'Error creating new workout',
+        };
+      }
+    })
+  );
 
   return { success: true, data: workout_id };
 };
