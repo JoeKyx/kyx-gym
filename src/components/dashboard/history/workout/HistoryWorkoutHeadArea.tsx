@@ -137,7 +137,9 @@ const HistoryWorkoutHeadArea: FC<HistoryWorkoutHeadAreaProps> = forwardRef<
           </div>
           <div className='flex items-center gap-2'>
             <Dumbbell />
-            <p className='text-sm text-gray-500'>{weightLifted} kg</p>
+            <p className='text-sm text-gray-500'>
+              {weightLifted.toFixed(2)} kg
+            </p>
           </div>
         </div>
         {props.userProfile ? (

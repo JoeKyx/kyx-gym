@@ -268,7 +268,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
             />
             <div className='mb-4 flex flex-col items-start'>
               <div className='flex justify-between gap-2 text-gray-600'>
-                <span>Running for: </span>
+                <span>Workout active for: </span>
                 <WorkoutDuration createdAt={workout.created_at} />
               </div>
               <span>Weight lifted so far: {totalWeight.toFixed(2)} kg</span>
