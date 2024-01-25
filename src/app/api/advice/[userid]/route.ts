@@ -1,6 +1,7 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { differenceInDays } from 'date-fns';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdviceForUser } from '@/lib/adviceAi';
@@ -16,11 +17,15 @@ export async function GET(
 ) {
   const dev = process.env.NODE_ENV === 'development';
   logger('inc request');
-  const res = NextResponse.next();
 
   const userid = context.params.userid;
   logger(userid, 'userid');
-  const supabase = createMiddlewareClient<Database>({ req, res });
+  const cookieStore = cookies();
+
+  const supabase = createServerComponentClient<Database>({
+    cookies: () => cookieStore,
+  });
+
   const { data, error } = await supabase
     .from('userprofile')
     .select('*')
