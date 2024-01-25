@@ -19,6 +19,7 @@
     "update-types": "npx supabase gen types typescript --project-id \"$PROJECT_REF\" > types/supabase.ts"
   },
   "dependencies": {
+    "@edge-runtime/cookies": "^4.0.3",
     "@heroicons/react": "^1.0.6",
     "@nanostores/react": "github:ai/react",
     "@radix-ui/react-accordion": "^1.1.2",

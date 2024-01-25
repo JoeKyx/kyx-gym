@@ -24,6 +24,8 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
 
     const profileContext = useProfile();
 
+    const dev = process.env.NODE_ENV === 'development';
+
     const [advice, setAdvice] = useState<Advice | null>(null);
     const [adviceText, setAdviceText] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -140,8 +142,8 @@ const AiAdvice: FC<AiAdviceProps> = forwardRef<HTMLDivElement, AiAdviceProps>(
               )}
 
               {(!advice ||
-                differenceInDays(new Date(), new Date(advice.created_at)) >
-                  3) &&
+                differenceInDays(new Date(), new Date(advice.created_at)) > 3 ||
+                dev) &&
               profileContext.isOwn &&
               !writing &&
               !generated ? (

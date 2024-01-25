@@ -1,23 +1,26 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { differenceInDays } from 'date-fns';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdviceForUser } from '@/lib/adviceAi';
 import logger from '@/lib/logger';
 
 import { Database } from '@/types/supabase';
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 export async function GET(
-  request: Request,
+  req: NextRequest,
   context: { params: { userid: string } }
 ) {
+  const dev = process.env.NODE_ENV === 'development';
   logger('inc request');
+  const res = NextResponse.next();
+
   const userid = context.params.userid;
   logger(userid, 'userid');
-  const supabase = createRouteHandlerClient<Database>({ cookies });
+  const supabase = createMiddlewareClient<Database>({ req, res });
   const { data, error } = await supabase
     .from('userprofile')
     .select('*')
@@ -52,7 +55,7 @@ export async function GET(
 
   // Check if prevAdvice is older than 3 days or if there is no prevAdvice
   let daysSincePrevAdvice = 4;
-  if (prevAdvice) {
+  if (prevAdvice && !dev) {
     daysSincePrevAdvice = differenceInDays(
       new Date(),
       new Date(prevAdvice.created_at)
