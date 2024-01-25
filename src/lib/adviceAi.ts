@@ -25,7 +25,7 @@ type OpenAiWorkout = {
   }[];
 };
 
-const params: OpenAI.Chat.CompletionCreateParamsStreaming = {
+const params: OpenAI.Chat.ChatCompletionCreateParamsStreaming = {
   messages: [
     {
       role: 'system',
