@@ -52,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
+    <html className='!scroll-smooth'>
       <body className='bg-indigo-100'>
         <main>
           {children}

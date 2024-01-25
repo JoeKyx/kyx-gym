@@ -32,13 +32,13 @@ const FakeAiResponse: FC<FakeAiResponseProps> = forwardRef<
   return (
     <div
       className={cn(
-        'flex h-96 flex-col gap-10 drop-shadow-lg  md:flex-row',
+        'flex h-96 flex-col items-center justify-center  gap-10 drop-shadow-lg md:flex-row',
         className
       )}
       ref={ref}
       {...rest}
     >
-      <div className='mx-auto my-auto w-40'>
+      <div className=' w-40'>
         <Button leftIcon={BrainCircuit} onClick={() => setButtonPressed(true)}>
           Ask KyxAI
         </Button>

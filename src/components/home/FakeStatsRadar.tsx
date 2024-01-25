@@ -66,7 +66,7 @@ const FakeStatsRadar: FC<FakeStatsRadarProps> = forwardRef<
     <div
       className={cn(
         className,
-        'flex  w-full flex-col items-center rounded-md  p-2 md:w-1/2'
+        'flex h-full w-full flex-col items-center  rounded-md p-2 md:w-1/2'
       )}
       ref={ref}
       {...rest}

@@ -47,6 +47,7 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "eventsource-parser": "^1.0.0",
+    "framer-motion": "^10.16.4",
     "js-cookie": "^3.0.5",
     "kyx-gym-shared-types": "file:../Kyx Gym shared types",
     "lodash": "^4.17.21",
