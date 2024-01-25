@@ -33,7 +33,7 @@ const params: OpenAI.Chat.CompletionCreateParamsStreaming = {
         'You are a fitness AI that gives advice to users based on their workout history. You are part of a fitness app in which a user can log their workouts. I will provide you the last 5 workouts for a user and you will provide them advice for their next workouts.',
     },
   ],
-  model: 'gpt-4',
+  model: 'gpt-3.5-turbo',
   stream: true as const,
 };
 
@@ -42,7 +42,7 @@ export async function getAdviceForUser(
   userid: string
 ) {
   logger(userid, 'Generating Advice for User');
-  // Get last 5 workouts for user
+  // Get last 20 workouts for user
   const { data: workouts, error } = await supabase
     .from('workouts')
     .select(
@@ -51,7 +51,7 @@ export async function getAdviceForUser(
     .eq('userid', userid)
     .eq('status', 'finished')
     .order('finished_at', { ascending: false })
-    .limit(10);
+    .limit(20);
   if (error) {
     throw error;
   }
