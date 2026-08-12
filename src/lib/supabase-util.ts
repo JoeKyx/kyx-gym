@@ -14,6 +14,7 @@ import {
   DBMuscle,
   DBSet,
   DBUpdateWorkout,
+  DBWorkout,
   DBWorkoutItem,
   Set,
   UpdateSet,
@@ -198,7 +199,7 @@ export async function getFilledWorkout(workout_id: string | number) {
   const { data, error } = await supabase
     .from('workouts')
     .select(
-      '*, workout_items(*, exercises(*, muscles(*), exercise_categories(*)), sets(*))'
+      '*, workout_items(*, exercises(*, muscles(*), exercise_categories(*)), sets(*))',
     )
     .eq('id', workout_id)
     .single();
@@ -214,7 +215,7 @@ export async function getFilledWorkout(workout_id: string | number) {
   const exerciseIds = workoutItems.map((workoutItem) => workoutItem.exerciseid);
   const { data: previousSets, error: previousSetsError } = await supabase.rpc(
     'get_latest_finished_sets',
-    { user_id: data.userid, exercise_ids: exerciseIds }
+    { user_id: data.userid, exercise_ids: exerciseIds },
   );
   if (previousSetsError) {
     logger(previousSetsError, 'error getting previous sets');
@@ -228,11 +229,11 @@ export async function getFilledWorkout(workout_id: string | number) {
   const workoutItemsWithPreviousSets = workoutItems.map((workoutItem) => {
     const previousSetsForWorkoutItem =
       previousSets?.filter(
-        (previousSet) => previousSet.exercise_id === workoutItem.exerciseid
+        (previousSet) => previousSet.exercise_id === workoutItem.exerciseid,
       ) || [];
     const sets = workoutItem.sets.map((set) => {
       const previousSet = previousSetsForWorkoutItem.find(
-        (previousSet) => previousSet.position === set.position
+        (previousSet) => previousSet.position === set.position,
       );
       if (previousSet) {
         return { ...set, previous_set: previousSet };
@@ -305,7 +306,7 @@ export async function createNewWorkoutItems(
   exercises: DBExercise[],
   is_finished: boolean,
   positionInWorkout?: number,
-  amountOfSets?: number
+  amountOfSets?: number,
 ) {
   const user = await supabase.auth.getUser();
   const userId = user.data.user?.id;
@@ -345,7 +346,7 @@ export async function createNewWorkoutItems(
         exerciseid: exercise.id,
         is_finished,
         position: pos++,
-      }))
+      })),
     )
     .select();
 
@@ -398,7 +399,7 @@ export async function createNewWorkoutItems(
 
 export const updateSetInDB = async (
   setId: string | number,
-  update: Set
+  update: Set,
 ): Promise<SupabaseUtilReturnType<DBSet>> => {
   const updateSet: UpdateSet = {
     weight: update.weight,
@@ -439,7 +440,7 @@ export const updateSetInDB = async (
 
 export const addNewSet = async (
   workout_id: number,
-  workout_item_id: number
+  workout_item_id: number,
 ) => {
   const user = await supabase.auth.getUser();
   const userId = user.data.user?.id;
@@ -473,7 +474,7 @@ export const addNewSet = async (
   // Get previous set
   const { data: previousSet, error: previousSetError } = await supabase.rpc(
     'get_latest_finished_sets',
-    { user_id: userId, exercise_ids: [data.workout_items.exerciseid] }
+    { user_id: userId, exercise_ids: [data.workout_items.exerciseid] },
   );
   if (previousSetError) {
     logger(previousSetError || 'No data');
@@ -485,7 +486,7 @@ export const addNewSet = async (
     return { success: true, data };
   }
   const previousSetForPosition = previousSet.find(
-    (previousSet) => previousSet.position === data.position
+    (previousSet) => previousSet.position === data.position,
   );
   if (!previousSetForPosition) {
     return { success: true, data };
@@ -545,7 +546,7 @@ export const deleteWorkoutItem = async (workout_item_id: number) => {
 
 export const updateWorkoutInDB = async (
   update: Partial<DBUpdateWorkout>,
-  id: number
+  id: number,
 ) => {
   logger(update, 'update workout');
   logger(id, 'id');
@@ -563,16 +564,37 @@ export const updateWorkoutInDB = async (
   return { success: true, data };
 };
 
-export const finishWorkoutInDB = async (workout_id: number) => {
+export const finishWorkoutInDB = async (
+  workout_id: number,
+): Promise<SupabaseUtilReturnType<DBWorkout>> => {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    logger(userError || 'No signed-in user', 'Error finishing workout');
+    return {
+      success: false,
+      error: 'You need to be signed in to finish a workout.',
+    };
+  }
+
   const { data, error } = await supabase
     .from('workouts')
     .update({ status: 'finished' })
-    .eq('id', workout_id);
-  if (error) {
-    logger(error);
+    .eq('id', workout_id)
+    .eq('userid', user.id)
+    .eq('status', 'active')
+    .select('*')
+    .maybeSingle();
+  if (error || !data) {
+    logger(error || 'Workout was not updated', 'Error finishing workout');
     return {
       success: false,
-      error: error?.message || 'Error finishing workout',
+      error:
+        error?.message ||
+        'Workout was not active, could not be found, or you do not have permission to finish it.',
     };
   }
   return { success: true, data };
@@ -592,7 +614,7 @@ export const getWorkout = async (workout_id: number) => {
 
 export const getRecordsForExercise = async (
   exerciseId: number,
-  userId: string
+  userId: string,
 ) => {
   const { data, error } = await supabase
     .from('records')
@@ -657,7 +679,7 @@ export const removePlannedWorkout = async (id: number) => {
 
 export const addExercise = async (
   exercise: DBInsertExercise,
-  muscleIds: number[]
+  muscleIds: number[],
 ) => {
   logger(exercise, 'exercise');
   const { data, error } = await supabase
@@ -676,7 +698,7 @@ export const addExercise = async (
     muscleIds.map((muscleId) => ({
       exerciseid: data?.id,
       muscleid: muscleId,
-    }))
+    })),
   );
 
   if (muscleError) {
@@ -692,7 +714,7 @@ export const addExercise = async (
 
 const workoutItemsToTemplateItems = (
   workoutItems: WorkoutItem[],
-  templateId: number
+  templateId: number,
 ): DBInsertTemplateItem[] => {
   const templateItems: DBInsertTemplateItem[] = [];
   workoutItems.forEach((workoutItem) => {
@@ -738,7 +760,7 @@ export const saveAsTemplateToDB = async (workout: Workout, name: string) => {
 
   const template_items = workoutItemsToTemplateItems(
     workout.workout_items,
-    templateId
+    templateId,
   );
 
   const { error: templateItemError } = await supabase
@@ -762,7 +784,7 @@ export const loadTemplatesFromDB = async () => {
   const { data, error } = await supabase
     .from('templates')
     .select(
-      '*, owner: userprofile(*), main_muscle_filled: muscles(*), template_items: template_items(*, exercise: exercises(*, muscles(*), exercise_categories(*)))'
+      '*, owner: userprofile(*), main_muscle_filled: muscles(*), template_items: template_items(*, exercise: exercises(*, muscles(*), exercise_categories(*)))',
     )
     .or(`userid.eq.${userId}, public.eq.true`);
   if (error || !data) {
@@ -794,7 +816,7 @@ export const loadTemplateFromDB = async (templateId: number) => {
   const { data, error } = await supabase
     .from('templates')
     .select(
-      '*, template_items: template_items(*, exercise: exercises(*, muscles(*), exercise_categories(*)))'
+      '*, template_items: template_items(*, exercise: exercises(*, muscles(*), exercise_categories(*)))',
     )
     .eq('id', templateId)
     .single();
@@ -810,7 +832,7 @@ export const loadTemplateFromDB = async (templateId: number) => {
 
 export const newWorkoutFromTemplate = async (
   userid: string,
-  templateid: number
+  templateid: number,
 ) => {
   logger(userid, 'userid');
 
@@ -864,7 +886,7 @@ export const newWorkoutFromTemplate = async (
 
   const updateNameRes = await updateWorkoutInDB(
     { name: workoutName },
-    workout_id
+    workout_id,
   );
 
   if (!updateNameRes.success) {
@@ -889,7 +911,8 @@ export const newWorkoutFromTemplate = async (
     workoutItems.map(async (workoutItem) => {
       const sets: DBInsertSet[] = [];
       const template_item = template.template_items.find(
-        (template_item) => template_item.exercise?.id === workoutItem.exerciseid
+        (template_item) =>
+          template_item.exercise?.id === workoutItem.exerciseid,
       );
       if (!template_item) {
         throw new Error('No template item found');
@@ -913,7 +936,7 @@ export const newWorkoutFromTemplate = async (
           error: setsError?.message || 'Error creating new workout',
         };
       }
-    })
+    }),
   );
 
   return { success: true, data: workout_id };
@@ -938,7 +961,7 @@ export const loadFinishedWorkouts = async (userId: string) => {
 
 export const loadPreviousSetsForWorkoutItems = async (
   userId: string,
-  workoutItems: WorkoutItem[]
+  workoutItems: WorkoutItem[],
 ) => {
   const exerciseIds = workoutItems.map((workoutItem) => workoutItem.exerciseid);
   const { data, error } = await supabase.rpc('get_latest_finished_sets', {
@@ -957,7 +980,7 @@ export const loadPreviousSetsForWorkoutItems = async (
 
 export const loadPreviousSetsForWorkoutItem = async (
   userId: string,
-  workoutItem: WorkoutItem
+  workoutItem: WorkoutItem,
 ) => {
   const { data, error } = await supabase.rpc('get_latest_finished_sets', {
     user_id: userId,
@@ -1065,14 +1088,14 @@ export const getTemplate = async (templateId: number) => {
 
 export const updateTemplateInDB = async (
   templateId: number,
-  workout: Workout
+  workout: Workout,
 ) => {
   logger(templateId, 'Updating template');
   logger(workout.userid, 'userid');
   // Update the template in the db with anything that changed
   const templateItems = workoutItemsToTemplateItems(
     workout.workout_items,
-    templateId
+    templateId,
   );
   // delete previous template Items
   const { error: deleteTemplateItemsError } = await supabase

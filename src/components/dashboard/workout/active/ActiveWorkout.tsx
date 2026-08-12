@@ -56,7 +56,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const [inputValues, setInputValues] = useState<InputValues>({});
 
   const [loadingAddSet, setLoadingAddSet] = useState<Record<number, boolean>>(
-    {}
+    {},
   );
 
   const [deletingWorkoutLoading, setDeletingWorkoutLoading] =
@@ -106,8 +106,16 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const socialContext = useSocial();
 
   const playSound = (soundUrl: string) => {
-    const audio = new Audio(soundUrl);
-    audio.play();
+    try {
+      const audio = new Audio(soundUrl);
+      void audio
+        .play()
+        .catch((audioError) =>
+          logger(audioError, 'Unable to play workout sound'),
+        );
+    } catch (audioError) {
+      logger(audioError, 'Unable to create workout sound');
+    }
   };
 
   const allSetsFinished = (sets: DBSet[]): boolean => {
@@ -121,7 +129,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
 
   const debouncedUpdateWorkoutName = useMemo(
     () => _.debounce(activeWorkoutContext.updateWorkoutName, 5000),
-    [activeWorkoutContext.updateWorkoutName]
+    [activeWorkoutContext.updateWorkoutName],
   );
 
   const handleWorkoutNameChange = useCallback(
@@ -129,13 +137,13 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       if (!workout || name.length === 0) return;
       debouncedUpdateWorkoutName(name);
     },
-    [debouncedUpdateWorkoutName, workout]
+    [debouncedUpdateWorkoutName, workout],
   ); // Add other dependencies if necessary
 
   const handleInputChange = (
     set: Set,
     field: 'weight' | 'reps' | 'speed' | 'distance',
-    value: string
+    value: string,
   ) => {
     const newValues = { ...inputValues[set.id], [field]: value };
     setInputValues({ ...inputValues, [set.id]: newValues });
@@ -170,25 +178,46 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   };
 
   const finishWorkout = async () => {
-    setShowWorkoutNotFinishedModal(false);
-    playSound(finishedWorkoutSound);
-    const res = await activeWorkoutContext.finishWorkout();
-    if (res.success) {
-      setFinishedWorkoutLoading(false);
-      router.push(
-        `/dashboard/profile/${socialContext?.userProfile?.username}/history/` +
-          activeWorkoutContext.activeWorkout?.id
+    if (!workout) {
+      setError(
+        'Workout could not be loaded. Please refresh the page and try again.',
       );
-    } else {
+      return;
+    }
+
+    const workoutId = workout.id;
+    const username = socialContext?.userProfile?.username;
+
+    setError('');
+    setShowWorkoutNotFinishedModal(false);
+    setShowTemplateChangedModal(false);
+    setFinishedWorkoutLoading(true);
+
+    try {
+      const res = await activeWorkoutContext.finishWorkout();
+      if (!res.success) {
+        setError(res.message);
+        return;
+      }
+
+      playSound(finishedWorkoutSound);
+
+      if (username) {
+        router.replace(`/dashboard/profile/${username}/history/${workoutId}`);
+      } else {
+        router.replace('/dashboard');
+      }
+    } catch (finishError) {
+      logger(finishError, 'Unexpected error finishing workout');
+      setError('Unable to finish workout. Please try again.');
+    } finally {
       setFinishedWorkoutLoading(false);
-      setError(res.message);
     }
   };
 
   const onUpdateTemplate = async () => {
     setShowTemplateChangedModal(false);
     await activeWorkoutContext.updateTemplate();
-    setFinishedWorkoutLoading(true);
     await finishWorkout();
   };
 
@@ -205,8 +234,6 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       setShowTemplateChangedModal(true);
       return;
     }
-
-    setFinishedWorkoutLoading(true);
 
     await finishWorkout();
   };

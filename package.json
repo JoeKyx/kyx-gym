@@ -7,13 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "eslint src --fix && yarn format",
-    "lint:strict": "eslint --max-warnings=0 src",
-    "typecheck": "tsc --noEmit --incremental false",
-    "test:watch": "jest --watch",
-    "test": "jest",
-    "format": "prettier -w .",
-    "format:check": "prettier -c .",
+    "lint:fix": "node ./node_modules/eslint/bin/eslint.js src --fix && yarn format",
+    "lint:strict": "node ./node_modules/eslint/bin/eslint.js --max-warnings=0 src",
+    "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit --incremental false",
+    "test:watch": "node ./node_modules/jest/bin/jest.js --watch",
+    "test": "node ./node_modules/jest/bin/jest.js",
+    "format": "node ./node_modules/prettier/bin/prettier.cjs -w .",
+    "format:check": "node ./node_modules/prettier/bin/prettier.cjs -c .",
     "postbuild": "next-sitemap --config next-sitemap.config.js",
     "prepare": "husky install",
     "update-types": "npx supabase gen types typescript --project-id \"$PROJECT_REF\" > types/supabase.ts"
@@ -107,11 +107,11 @@
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
-      "eslint --max-warnings=0",
-      "prettier -w"
+      "node ./node_modules/eslint/bin/eslint.js --max-warnings=0",
+      "node ./node_modules/prettier/bin/prettier.cjs -w"
     ],
     "**/*.{json,css,scss,md,webmanifest}": [
-      "prettier -w"
+      "node ./node_modules/prettier/bin/prettier.cjs -w"
     ]
   }
 }
