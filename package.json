@@ -12,8 +12,8 @@
     "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit --incremental false",
     "test:watch": "node ./node_modules/jest/bin/jest.js --watch",
     "test": "node ./node_modules/jest/bin/jest.js",
-    "format": "node ./node_modules/prettier/bin/prettier.cjs -w .",
-    "format:check": "node ./node_modules/prettier/bin/prettier.cjs -c .",
+    "format": "node ./scripts/run-prettier.cjs -w .",
+    "format:check": "node ./scripts/run-prettier.cjs -c .",
     "postbuild": "next-sitemap --config next-sitemap.config.js",
     "prepare": "husky install",
     "update-types": "npx supabase gen types typescript --project-id \"$PROJECT_REF\" > types/supabase.ts"
@@ -108,10 +108,10 @@
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
       "node ./node_modules/eslint/bin/eslint.js --max-warnings=0",
-      "node ./node_modules/prettier/bin/prettier.cjs -w"
+      "node ./scripts/run-prettier.cjs -w"
     ],
     "**/*.{json,css,scss,md,webmanifest}": [
-      "node ./node_modules/prettier/bin/prettier.cjs -w"
+      "node ./scripts/run-prettier.cjs -w"
     ]
   }
 }
