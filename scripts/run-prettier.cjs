@@ -20,7 +20,7 @@ const result = spawnSync(
     path.resolve(path.dirname(packageJsonPath), prettierBin),
     ...process.argv.slice(2),
   ],
-  { stdio: 'inherit' },
+  { stdio: 'inherit' }
 );
 
 if (result.error) {

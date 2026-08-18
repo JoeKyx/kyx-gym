@@ -56,7 +56,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const [inputValues, setInputValues] = useState<InputValues>({});
 
   const [loadingAddSet, setLoadingAddSet] = useState<Record<number, boolean>>(
-    {},
+    {}
   );
 
   const [deletingWorkoutLoading, setDeletingWorkoutLoading] =
@@ -111,7 +111,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       void audio
         .play()
         .catch((audioError) =>
-          logger(audioError, 'Unable to play workout sound'),
+          logger(audioError, 'Unable to play workout sound')
         );
     } catch (audioError) {
       logger(audioError, 'Unable to create workout sound');
@@ -129,7 +129,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
 
   const debouncedUpdateWorkoutName = useMemo(
     () => _.debounce(activeWorkoutContext.updateWorkoutName, 5000),
-    [activeWorkoutContext.updateWorkoutName],
+    [activeWorkoutContext.updateWorkoutName]
   );
 
   const handleWorkoutNameChange = useCallback(
@@ -137,13 +137,13 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       if (!workout || name.length === 0) return;
       debouncedUpdateWorkoutName(name);
     },
-    [debouncedUpdateWorkoutName, workout],
+    [debouncedUpdateWorkoutName, workout]
   ); // Add other dependencies if necessary
 
   const handleInputChange = (
     set: Set,
     field: 'weight' | 'reps' | 'speed' | 'distance',
-    value: string,
+    value: string
   ) => {
     const newValues = { ...inputValues[set.id], [field]: value };
     setInputValues({ ...inputValues, [set.id]: newValues });
@@ -180,7 +180,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   const finishWorkout = async () => {
     if (!workout) {
       setError(
-        'Workout could not be loaded. Please refresh the page and try again.',
+        'Workout could not be loaded. Please refresh the page and try again.'
       );
       return;
     }

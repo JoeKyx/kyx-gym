@@ -20,7 +20,7 @@ jest.mock('@/lib/logger', () => jest.fn());
 import { finishWorkoutInDB } from '@/lib/supabase-util';
 
 const { mockSupabaseClient } = jest.requireMock(
-  '@supabase/auth-helpers-nextjs',
+  '@supabase/auth-helpers-nextjs'
 ) as {
   mockSupabaseClient: {
     auth: { getUser: jest.Mock };

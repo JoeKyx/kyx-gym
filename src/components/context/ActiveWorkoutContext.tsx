@@ -43,23 +43,23 @@ interface IActiveWorkoutContext {
   records: Record[];
   updateSet: (set: Set) => Promise<{ success: boolean; message: string }>;
   addSet: (
-    workout_item_id: number,
+    workout_item_id: number
   ) => Promise<{ success: boolean; message: string }>;
   deleteSet: (setId: number) => Promise<{ success: boolean; message: string }>;
   addExercisesToWorkout: (
-    exercises: Exercise[],
+    exercises: Exercise[]
   ) => Promise<{ success: boolean; message: string }>;
   updateWorkoutName: (
-    name: string,
+    name: string
   ) => Promise<{ success: boolean; message: string }>;
   finishWorkout: () => Promise<{ success: boolean; message: string }>;
   createNewExercise: (
     exercise: DBInsertExercise,
-    muscles: number[],
+    muscles: number[]
   ) => Promise<{ success: boolean; message: string }>;
   loadingExercises: number | null;
   deleteWorkoutItem: (
-    workout_item_id: number,
+    workout_item_id: number
   ) => Promise<{ success: boolean; message: string }>;
   deleteWorkout: () => Promise<{ success: boolean; message: string }>;
   changedWorkoutComparedToTemplate: () => Promise<boolean>;
@@ -126,7 +126,7 @@ export function ActiveWorkoutProvider({
   const [loading, setLoading] = useState(true);
   const [availableMuscles, setAvailableMuscles] = useState<DBMuscle[]>([]);
   const [availableCategories, setAvailableCategories] = useState<DBCategory[]>(
-    [],
+    []
   );
   const [records, setRecords] = useState<Record[]>([]);
   const [loadingExercises, setLoadingExercises] = useState<number>(0);
@@ -198,7 +198,7 @@ export function ActiveWorkoutProvider({
       activeWorkout.id,
       exercises,
       false,
-      activeWorkout.workout_items.length,
+      activeWorkout.workout_items.length
     );
     if (!workoutItems) {
       return {
@@ -211,7 +211,7 @@ export function ActiveWorkoutProvider({
     // Load previous sets
     const previousSetRes = await loadPreviousSetsForWorkoutItems(
       activeWorkout.userid,
-      workoutItems,
+      workoutItems
     );
     if (previousSetRes.success) {
       logger(previousSetRes.data, 'previousSetRes.data');
@@ -221,7 +221,7 @@ export function ActiveWorkoutProvider({
           const previousSet = previousSetRes.data?.find(
             (previousSet) =>
               previousSet.exercise_id === workoutItem.exerciseid &&
-              previousSet.position === set.position,
+              previousSet.position === set.position
           );
           if (previousSet) {
             set.previous_set = previousSet;
@@ -242,7 +242,7 @@ export function ActiveWorkoutProvider({
   const addSet = async (workout_item_id: number) => {
     const newSetRes = await addNewSet(
       workout_id as number,
-      workout_item_id as number,
+      workout_item_id as number
     );
     if (!newSetRes.success || !newSetRes.data) {
       return { success: false, message: 'Error adding set to workout' };
@@ -321,7 +321,7 @@ export function ActiveWorkoutProvider({
       };
     const newWorkout = { ...activeWorkout };
     const newWorkoutItems = newWorkout.workout_items.filter(
-      (item) => item.id !== workout_item_id,
+      (item) => item.id !== workout_item_id
     );
     newWorkout.workout_items = newWorkoutItems;
     setActiveWorkout(newWorkout);
@@ -406,7 +406,7 @@ export function ActiveWorkoutProvider({
     const res = await finishWorkoutInDB(activeWorkout.id);
     if (res.success) {
       setActiveWorkout((currentWorkout) =>
-        currentWorkout ? { ...currentWorkout, ...res.data } : currentWorkout,
+        currentWorkout ? { ...currentWorkout, ...res.data } : currentWorkout
       );
       return {
         success: true,
@@ -443,7 +443,7 @@ export function ActiveWorkoutProvider({
 
   const createNewExercise = async (
     exercise: DBInsertExercise,
-    muscles: number[],
+    muscles: number[]
   ) => {
     const res = await addExercise(exercise, muscles);
     if (res.success && res.data) {
@@ -482,7 +482,7 @@ export function ActiveWorkoutProvider({
     if (!activeWorkout.template_id) return;
     const updateTemplateRes = await updateTemplateInDB(
       activeWorkout.template_id,
-      activeWorkout,
+      activeWorkout
     );
     if (!updateTemplateRes.success) {
       setError(updateTemplateRes.error || 'Error updating template');
@@ -522,7 +522,7 @@ export function useActiveWorkout() {
   const context = React.useContext(ActiveWorkoutContext);
   if (context === undefined) {
     throw new Error(
-      'useActiveWorkout must be used within a ActiveWorkoutProvider',
+      'useActiveWorkout must be used within a ActiveWorkoutProvider'
     );
   }
   return context;
