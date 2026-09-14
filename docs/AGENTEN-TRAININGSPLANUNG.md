@@ -115,3 +115,54 @@ Geschäftliche Revisions-/Idempotenzkonflikte verwenden `PT409`, nicht PostgreSQ
 transientes `40001`. So lösen sie keine automatischen PostgREST-Transaktions-Retries
 aus. Migration 004 korrigiert diese Live-Kompatibilität gezielt.
 Quelle: https://supabase.com/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b
+
+## `list_workouts`: neueste Trainings und Datumsfilter
+
+Ohne Parameter liefert das Tool die neuesten 20 eigenen aktiven oder abgeschlossenen
+Workouts. Sortierung: `created_at DESC NULLS LAST, id DESC`. `created_at` ist der
+Trainingsbeginn/Anlagezeitpunkt, **nicht** `finished_at`. Bestätigte Leistungswerte
+und die bisherige Array-Antwort bleiben unverändert. Zuvor wurde nach aufsteigender
+ID sortiert; IDs bilden weder Trainingsdatum noch Aktualität zuverlässig ab.
+
+Optionale Parameter:
+
+- `from`: inklusive Untergrenze von `created_at`.
+- `to`: exklusive Obergrenze von `created_at`; muss nach `from` liegen.
+- Beide Grenzen sind ISO-8601-Zeitstempel mit `Z` oder explizitem UTC-Offset,
+  maximal sechs Nachkommastellen. Kein reines Datum und keine serverseitige
+  Interpretation einer lokalen Zeitzone. Offset-Werte werden als absolute
+  Zeitpunkte verglichen. Für lokale Kalendertage die jeweiligen Offset-Grenzen
+  verwenden, auch wenn sich durch Sommerzeit der Offset zwischen den Grenzen ändert.
+- `limit`: 1–50, Standard 20.
+- `after`: weiterhin die numerische ID des letzten Ergebnisses. Die Datenbank
+  löst deren Zeitstempel ausschließlich innerhalb eigener lesbarer Workouts auf
+  und setzt mit dem kleineren Paar `(created_at, id)` fort. Gleichzeitige Workouts
+  gehen dadurch nicht verloren und werden nicht doppelt geliefert. Filter auf
+  Folgeseiten beibehalten; ein leeres Array beendet die Pagination.
+
+Beispiel: Trainings im September 2026 nach deutscher Ortszeit:
+
+```json
+{
+  "name": "list_workouts",
+  "arguments": {
+    "from": "2026-09-01T00:00:00+02:00",
+    "to": "2026-10-01T00:00:00+02:00",
+    "limit": 20
+  }
+}
+```
+
+Für die nächste Seite dieselben Argumente und `after` mit der letzten gelieferten
+Workout-ID senden. Kein neues Cursorformat erforderlich. Die neue Sortierung gilt
+auch für bisherige Clients; nach dem Update laufende alte Pagination ohne `after`
+neu beginnen. Fremde, nicht lesbare oder gelöschte Cursor werden einheitlich als
+ungültig abgelehnt. Bei gelöschtem Cursor ebenfalls ohne `after` neu beginnen.
+Pagination ist kein Snapshot: Änderungen am Trainingsbeginn können die Position
+verändern. Neuere Einfügungen verschieben bestehende Folgeseiten nicht. Legacy-
+Workouts ohne Zeitstempel erscheinen ungefiltert zuletzt nach ID absteigend;
+bei Datumsfiltern werden sie ausgeschlossen. `exercise_history` bleibt unverändert.
+
+Migration: `202609140005_workout_chronology.sql`; getrennt von der App vor deren
+Freischaltung installieren. Sie ersetzt ausschließlich den Listing-Zweig, behält
+Funktionsberechtigungen und die vorgeschalteten OAuth-/Eigentümerprüfungen bei.

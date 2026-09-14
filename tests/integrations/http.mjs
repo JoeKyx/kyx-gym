@@ -137,6 +137,32 @@ const tools = await (await rpc('tools/list')).json();
 assert.ok(tools.result.tools.some((t) => t.name === 'create_plan'));
 assert.ok(!tools.result.tools.some((t) => /delete|start_plan/.test(t.name)));
 pass('MCP initialize and explicit scoped tools');
+const workoutTool = tools.result.tools.find((t) => t.name === 'list_workouts');
+assert.equal(workoutTool.inputSchema.properties.from.format, 'date-time');
+const listing = await (
+  await rpc('tools/call', { name: 'list_workouts', arguments: { limit: 1 } })
+).json();
+assert.ok(!listing.result.isError);
+const workouts = JSON.parse(listing.result.content[0].text).data;
+assert.ok(workouts.length === 1);
+const bounded = await (
+  await rpc('tools/call', {
+    name: 'list_workouts',
+    arguments: { from: '2026-01-01T00:00:00Z', to: '2026-01-02T00:00:00Z' },
+  })
+).json();
+assert.deepEqual(JSON.parse(bounded.result.content[0].text).data, []);
+const invalidRange = await (
+  await rpc('tools/call', {
+    name: 'list_workouts',
+    arguments: { from: '2026-03-01T00:00:00Z', to: '2026-02-01T00:00:00Z' },
+  })
+).json();
+assert.ok(invalidRange.error || invalidRange.result?.isError);
+pass(
+  'MCP workout date schema, default listing, filtered result and invalid range'
+);
+
 const request = {
   name: 'create_plan',
   arguments: {

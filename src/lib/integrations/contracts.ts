@@ -64,8 +64,42 @@ const page = {
   after: id.optional(),
   limit: z.number().int().min(1).max(50).default(20),
 };
+// Explicit offsets avoid interpreting an agent's local date in the server timezone.
+const workoutDate = z
+  .string()
+  .datetime({ offset: true })
+  .refine((value) => {
+    const date = new Date(value);
+    const fraction = value.match(/\.(\d+)/)?.[1] || '';
+    const calendarDate = new Date(value.slice(0, 10) + 'T00:00:00Z');
+    return (
+      fraction.length <= 6 &&
+      Number.isFinite(date.getTime()) &&
+      Number.isFinite(calendarDate.getTime()) &&
+      calendarDate.toISOString().slice(0, 10) === value.slice(0, 10)
+    );
+  }, 'Expected a real ISO 8601 timestamp with Z or an explicit UTC offset');
+// Preserve PostgreSQL microsecond precision when validating a narrow range.
+const workoutInstant = (value: string) =>
+  BigInt(Date.parse(value)) * BigInt(1000) +
+  BigInt((value.match(/\.(\d+)/)?.[1] || '').padEnd(6, '0').slice(3, 6));
 export const inputs = {
-  list_workouts: z.object(page).strict(),
+  list_workouts: z
+    .object({
+      ...page,
+      from: workoutDate.optional(),
+      to: workoutDate.optional(),
+    })
+    .strict()
+    .refine(
+      ({ from, to }) =>
+        !from ||
+        !to ||
+        (Number.isFinite(Date.parse(from)) &&
+          Number.isFinite(Date.parse(to)) &&
+          workoutInstant(from) < workoutInstant(to)),
+      'from must be earlier than to (inclusive from, exclusive to)'
+    ),
   get_workout: z.object({ id, ...page }).strict(),
   get_workout_sets: z
     .object({ workout_id: id, workout_item_id: id, ...page })

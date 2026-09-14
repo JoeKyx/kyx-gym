@@ -75,3 +75,42 @@ it('advertises only allowed tools and never workout mutation or deletion', () =>
     required: ['request_id', 'plan'],
   });
 });
+
+it('validates workout date filters and advertises them to MCP clients', () => {
+  expect(inputs.list_workouts.parse({})).toEqual({ limit: 20 });
+  expect(
+    inputs.list_workouts.safeParse({
+      from: '2026-02-01T01:00:00+01:00',
+      to: '2026-03-01T00:00:00Z',
+      after: 5,
+    }).success
+  ).toBe(true);
+  for (const args of [
+    { from: '2026-02-30T00:00:00Z' },
+    { to: '2026-13-01T00:00:00Z' },
+    { from: '2026-02-01' },
+    { from: '2026-02-01T00:00:00' },
+    { to: 'yesterday' },
+    { from: '2026-02-01T00:00:00+99:00' },
+    { from: '2026-03-01T00:00:00Z', to: '2026-02-01T00:00:00Z' },
+    { from: '2026-02-01T01:00:00+01:00', to: '2026-02-01T00:00:00Z' },
+  ])
+    expect(inputs.list_workouts.safeParse(args).success).toBe(false);
+  expect(
+    inputs.list_workouts.safeParse({
+      from: '2026-02-01T00:00:00.000001Z',
+      to: '2026-02-01T00:00:00.000002Z',
+    }).success
+  ).toBe(true);
+  const tool = toolsFor(['training.read']).find(
+    (t) => t.name === 'list_workouts'
+  );
+  expect(tool?.inputSchema).toMatchObject({
+    properties: {
+      from: { type: 'string', format: 'date-time' },
+      to: { type: 'string', format: 'date-time' },
+      after: { type: 'integer' },
+    },
+  });
+  expect(tool?.description).toContain('created_at');
+});

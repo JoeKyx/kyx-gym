@@ -32,6 +32,12 @@ await db.exec(
     'utf8'
   )
 );
+await db.exec(
+  readFileSync(
+    'supabase/migrations/202609140005_workout_chronology.sql',
+    'utf8'
+  )
+);
 const alice = '00000000-0000-4000-8000-000000000001',
   bob = '00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users values ($1),($2)', [alice, bob]);
@@ -315,7 +321,8 @@ await check('Refresh rotation and immediate grant revocation', async () => {
 await check(
   'Feedback only after completion, own user and optimistic revision',
   async () => {
-    const w = (await run('list_workouts'))[0];
+    const w = (await run('list_workouts')).find((w) => w.status === 'active');
+    assert.ok(w, 'feedback test requires an active workout');
     await assert.rejects(
       run('save_feedback', {
         workout_id: w.id,
@@ -441,6 +448,70 @@ await check('Concurrent double start returns the same workout', async () => {
   ]);
   assert.equal(first.workout_id, second.workout_id);
 });
+await check(
+  'Workout chronology, date boundaries, tied cursors and owner isolation',
+  async () => {
+    const owner = '00000000-0000-4000-8000-000000000003';
+    await db.query('insert into auth.users values ($1)', [owner]);
+    // Deliberately non-chronological IDs, tied instants, different completion dates,
+    // an active workout, null timestamps and an unreadable status.
+    await db.query(
+      `insert into workouts(id,name,status,userid,created_at,finished_at) values
+    (9003,'old','finished',$1,'2026-01-01T00:00:00Z','2026-09-01T00:00:00Z'),
+    (9001,'new','active',$1,'2026-03-01T00:00:00Z',null),
+    (9004,'tie high','finished',$1,'2026-02-01T00:00:00Z',null),
+    (9002,'tie low','finished',$1,'2026-02-01T01:00:00+01:00',null),
+    (9006,'undated high','finished',$1,null,null),
+    (9005,'undated low','finished',$1,null,null),
+    (9007,'hidden','deleted',$1,'2026-04-01T00:00:00Z',null),
+    (9008,'foreign','finished',$2,'2026-04-01T00:00:00Z',null)`,
+      [owner, bob]
+    );
+    const list = (a) => run('list_workouts', a, owner);
+    const ids = (rows) => rows.map((w) => w.id);
+    assert.deepEqual(ids(await list({})), [9001, 9004, 9002, 9003, 9006, 9005]);
+    const all = [];
+    let after;
+    do {
+      const rows = await list({ limit: 1, ...(after ? { after } : {}) });
+      if (!rows.length) break;
+      all.push(...ids(rows));
+      after = rows[rows.length - 1].id;
+      assert.ok(all.length <= 6, 'cursor must progress');
+    } while (true);
+    assert.deepEqual(all, [9001, 9004, 9002, 9003, 9006, 9005]);
+    const range = {
+      from: '2026-02-01T01:00:00+01:00',
+      to: '2026-03-01T00:00:00Z',
+    };
+    assert.deepEqual(ids(await list(range)), [9004, 9002]);
+    assert.deepEqual(ids(await list({ ...range, limit: 1 })), [9004]);
+    assert.deepEqual(ids(await list({ ...range, limit: 1, after: 9004 })), [
+      9002,
+    ]);
+    assert.deepEqual(await list({ ...range, after: 9002 }), []);
+    assert.deepEqual(ids(await list({ from: '2026-03-01T00:00:00Z' })), [9001]);
+    assert.deepEqual(ids(await list({ to: '2026-02-01T00:00:00Z' })), [9003]);
+    for (const args of [
+      { from: range.to, to: range.from },
+      { from: range.to, to: range.to },
+      { from: 'not-a-date' },
+      { after: 9008 },
+      { after: 999999 },
+      { after: 9007 },
+    ])
+      await assert.rejects(() => list(args));
+    // A newer arrival between pages does not duplicate or displace older results.
+    await db.query(
+      "insert into workouts(id,name,status,userid,created_at) values (9009,'arrival','active',$1,'2026-05-01T00:00:00Z')",
+      [owner]
+    );
+    assert.deepEqual(
+      ids(await list({ after: 9001 })),
+      [9004, 9002, 9003, 9006, 9005]
+    );
+  }
+);
 console.log(
   `${passed} database integration checks passed. Fixture excludes unknown production triggers/RLS.`
 );

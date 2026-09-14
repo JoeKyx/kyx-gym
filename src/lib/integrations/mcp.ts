@@ -5,6 +5,11 @@ import { inputs, Operation, toolScopes } from '@/lib/integrations/contracts';
 // Convert the deliberately small schema vocabulary used by our tools. Runtime parsing
 // always uses the original Zod schema; unsupported additions fail during tools/list.
 export function jsonSchema(schema: z.ZodTypeAny): Record<string, unknown> {
+  if (schema instanceof z.ZodEffects) {
+    if (schema._def.effect.type !== 'refinement')
+      throw new Error('Unsupported tool schema effect');
+    return jsonSchema(schema.innerType());
+  }
   if (schema instanceof z.ZodOptional || schema instanceof z.ZodDefault)
     return jsonSchema(schema._def.innerType);
   if (schema instanceof z.ZodNullable)
@@ -38,6 +43,7 @@ export function jsonSchema(schema: z.ZodTypeAny): Record<string, unknown> {
   if (schema instanceof z.ZodString)
     return {
       type: 'string',
+      ...(schema.isDatetime ? { format: 'date-time' } : {}),
       ...(schema.minLength !== null ? { minLength: schema.minLength } : {}),
       ...(schema.maxLength !== null ? { maxLength: schema.maxLength } : {}),
     };
@@ -57,7 +63,7 @@ const descriptions: Partial<Record<Operation, string>> = {
   exercise_metadata:
     'Gültige Kategorien oder Muskeln für die Übungsanlage; after = letzte ID.',
   list_workouts:
-    'Eigene aktive und abgeschlossene Workouts; nur bestätigte Sätze zählen als Leistung. Pagination: after = letzte ID.',
+    'Eigene aktive und abgeschlossene Workouts, neueste zuerst: created_at (Trainingsbeginn) absteigend, bei gleicher Zeit ID absteigend; fehlende Zeit zuletzt. Optional from inklusive und to exklusiv filtern created_at, nicht finished_at. ISO-8601-Zeitstempel mit Z oder UTC-Offset und maximal 6 Nachkommastellen erforderlich; from muss vor to liegen. Standard limit=20, maximal 50. Folgeseite: after = ID des letzten Ergebnisses, gleiche Filter beibehalten; leeres Array beendet die Liste. Unbekannte/gelöschte Cursor sind ungültig: ohne after neu beginnen. Nur bestätigte Sätze zählen als Leistung.',
   get_workout:
     'Eigenes Workout mit ursprünglichem Plan und Feedback. Items nach ID paginiert: after = letzte Item-ID. Je Item erste 50 Sätze, weitere über get_workout_sets. actual=null bedeutet nicht bestätigt.',
   exercise_history:
