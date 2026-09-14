@@ -34,9 +34,9 @@ jobs:
       - run: npm test -- --runInBand
       - name: PostgreSQL integration tests
         run: |
-          docker run -d --name kyx-gym-agent-test-db -e POSTGRES_PASSWORD=local-test-only --health-cmd='pg_isready -U postgres' --health-interval=1s --health-timeout=3s --health-retries=30 postgres:16-alpine
+          docker run -d --name kyx-gym-agent-test-db -e POSTGRES_PASSWORD=local-test-only --health-cmd='pg_isready -h 127.0.0.1 -U postgres' --health-interval=1s --health-timeout=3s --health-retries=30 postgres:16-alpine
           for i in $(seq 1 30); do
-            if docker exec kyx-gym-agent-test-db pg_isready -U postgres; then break; fi
+            if docker exec kyx-gym-agent-test-db pg_isready -h 127.0.0.1 -U postgres; then break; fi
             sleep 1
           done
           KYX_TEST_POSTGRES=1 node tests/integrations/database.mjs
