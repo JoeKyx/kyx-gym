@@ -1,0 +1,3 @@
+# OAuth discovery is deliberately served from this standard dot-prefixed path.
+!src/app/.well-known/
+!src/app/.well-known/**

@@ -1,19 +1,23 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
+import { syncCookies } from '@/lib/supabase-cookie-adapter';
+
 import HistoryWorkout from '@/components/dashboard/history/workout/HistoryWorkout';
 
 import { Database } from '@/types/supabase';
 interface pageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 export const dynamic = 'force-dynamic';
-export default async function Page({ params }: pageProps) {
+export default async function Page(props: pageProps) {
+  const cookieStore = await cookies();
+  const params = await props.params;
   const loadWorkout = async () => {
     const supabase = createServerComponentClient<Database>({
-      cookies,
+      cookies: syncCookies(cookieStore),
     });
     // TODO: set is loading record is loading set - can be optimized...
     const { data, error } = await supabase

@@ -38,43 +38,57 @@ const HistoryWorkoutSet: FC<HistoryWorkoutSetProps> = ({
   };
 
   return (
-    <div className='flex flex-row items-start '>
-      <span className='text-primary-600 w-16 text-left font-semibold'>
-        {setNr}
-      </span>
-      <span className='w-20 text-left text-sm text-gray-500'>
-        {exerciseType === 'speed' ? `${set.speed} min` : `${set.reps} Reps`}
-      </span>
-      {exerciseType === 'weight' && (
-        <span className='w-20 text-left text-sm text-gray-500'>
-          {set.weight} kg
-        </span>
+    <div>
+      {set.target_reps != null && (
+        <p className='text-sm text-teal-800'>
+          Soll: {set.target_weight} kg × {set.target_reps} ·{' '}
+          {set.is_finished
+            ? `Ist: ${set.is_finished ? `${set.weight} kg` : '—'} × ${set.reps}`
+            : 'Nicht absolviert'}
+        </p>
       )}
-      {exerciseType === 'speed' && (
-        <span className='w-20 text-left text-sm text-gray-500'>
-          {set.distance} km
+      <div className='flex flex-row items-start '>
+        <span className='text-primary-600 w-16 text-left font-semibold'>
+          {setNr}
         </span>
-      )}
-      <div className='w-6 md:w-16'>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <TypeDisplay locked={true} set={set} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{set.type} Set</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      <div className='w-32'>
-        {isAnyRecord() && (
-          <RecordFlame
-            isVolume={isVolumeRecord()}
-            isWeight={isWeightRecord()}
-            mode='history'
-          />
+        <span className='w-20 text-left text-sm text-gray-500'>
+          {!set.is_finished
+            ? 'Nicht bestätigt'
+            : exerciseType === 'speed'
+            ? `${set.speed} min`
+            : `${set.reps} Reps`}
+        </span>
+        {exerciseType === 'weight' && (
+          <span className='w-20 text-left text-sm text-gray-500'>
+            {set.is_finished ? `${set.weight} kg` : '—'}
+          </span>
         )}
+        {exerciseType === 'speed' && (
+          <span className='w-20 text-left text-sm text-gray-500'>
+            {set.distance} km
+          </span>
+        )}
+        <div className='w-6 md:w-16'>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <TypeDisplay locked={true} set={set} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{set.type} Set</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        <div className='w-32'>
+          {set.is_finished && isAnyRecord() && (
+            <RecordFlame
+              isVolume={isVolumeRecord()}
+              isWeight={isWeightRecord()}
+              mode='history'
+            />
+          )}
+        </div>
       </div>
     </div>
   );

@@ -2,9 +2,12 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { syncCookies } from '@/lib/supabase-cookie-adapter';
+
 import { ChallengeProvider } from '@/components/context/ChallengesContext';
 import { SocialProvider } from '@/components/context/SocialContext';
 import FirstLoginModal from '@/components/dashboard/modals/FirstLoginModal';
+import { IntegrationAvailability } from '@/components/integrations/IntegrationAvailability';
 
 import { Database } from '@/types/supabase';
 export const dynamic = 'force-dynamic';
@@ -13,8 +16,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
   const supabase = createServerComponentClient<Database>({
-    cookies,
+    cookies: syncCookies(cookieStore),
   });
 
   const {
@@ -27,13 +31,15 @@ export default async function RootLayout({
   }
 
   return (
-    <SocialProvider>
-      <ChallengeProvider>
-        <div className='flex flex-col md:h-screen md:max-h-screen'>
-          {children}
-          <FirstLoginModal />
-        </div>
-      </ChallengeProvider>
-    </SocialProvider>
+    <IntegrationAvailability enabled={!!process.env.MCP_PUBLIC_URL}>
+      <SocialProvider>
+        <ChallengeProvider>
+          <div className='flex flex-col md:h-screen md:max-h-screen'>
+            {children}
+            <FirstLoginModal />
+          </div>
+        </ChallengeProvider>
+      </SocialProvider>
+    </IntegrationAvailability>
   );
 }
