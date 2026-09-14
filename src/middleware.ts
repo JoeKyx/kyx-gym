@@ -9,3 +9,11 @@ export async function middleware(req: NextRequest) {
   await supabase.auth.getSession();
   return res;
 }
+
+// These routes perform their own user/token verification. Machine clients must
+// not depend on Supabase browser-session refresh in Edge Middleware.
+export const config = {
+  matcher: [
+    '/((?!api/mcp|api/agent|api/oauth|\\.well-known|_next/static|_next/image|favicon.ico).*)',
+  ],
+};
