@@ -60,8 +60,10 @@ Ohne Konfiguration oder Migration bleibt die Funktion geschlossen.
 
 Das Live-Schema wurde nach Reaktivierung des Supabase-Projekts über eine
 TLS-geprüfte Nur-Lese-Verbindung abgeglichen: 24 Tabellen, 56 Policies und 49
-Trigger. Die beiden Migrationen wurden auf dem Produktionsschema in einer
+Trigger. Die ersten beiden Migrationen wurden auf dem Produktionsschema in einer
 Transaktion erfolgreich probeweise ausgeführt und vollständig zurückgerollt.
+
+Eine dritte Migration sichert den Suchpfad der RPC für bestehende Trigger ab: API-Rollen dürfen keine Objekte im öffentlichen Schema erzeugen; Legacy-Trigger finden ihre Tabellen weiterhin.
 
 Der bestehende Abschluss-Trigger löscht unbestätigte Sätze und leere Übungen.
 `gym_plan_sets` hält deshalb unabhängige unveränderliche Snapshots. Der Verlauf

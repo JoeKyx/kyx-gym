@@ -37,3 +37,11 @@ begin
  return new;
 end $$;
 create trigger trg_remove_unfinished_sets_and_empty_workout_items after update on workouts for each row execute function fn_remove_unfinished_sets_and_empty_workout_items();
+
+-- Production BEFORE INSERT trigger intentionally uses an unqualified table.
+create function public.set_insert_position() returns trigger language plpgsql as $$
+begin
+ new.position:=coalesce((select max(position)+1 from sets where workout_item_id=new.workout_item_id),1);
+ return new;
+end $$;
+create trigger tr_set_position_before_insert before insert on sets for each row execute function set_insert_position();
