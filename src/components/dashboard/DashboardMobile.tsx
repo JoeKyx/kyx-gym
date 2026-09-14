@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FC, forwardRef, useEffect, useState } from 'react';
 import { HTMLAttributes } from 'react';
 
+import { cn } from '@/lib';
 import logger from '@/lib/logger';
 import { hasActiveWorkout } from '@/lib/supabase-util';
 
@@ -92,7 +93,10 @@ const DashboardMobile: FC<DashboardMobileProps> = forwardRef<
         </Link>
       )}
       <Tabs.Root
-        className='flex h-screen w-full flex-col justify-start'
+        className={cn(
+          'flex h-screen w-full flex-col justify-start',
+          (activeWorkoutId || showInstallButton) && 'pt-[52px]'
+        )}
         defaultValue='profile'
       >
         <Tabs.Content

@@ -5,6 +5,7 @@ import ChallengesButton from '@/components/dashboard/ChallengesButton';
 import FriendsArea from '@/components/dashboard/friends/FriendsArea';
 import YourProfileButton from '@/components/dashboard/NewProfileButton';
 import NewWorkoutButton from '@/components/dashboard/NewWorkoutButton';
+import PlannedWorkoutsButton from '@/components/dashboard/PlannedWorkoutsButton';
 import StatsButton from '@/components/dashboard/StatsButton';
 import WorkoutFromTemplateButton from '@/components/dashboard/WorkoutFromTemplateButton';
 
@@ -20,6 +21,7 @@ const Dashboard: FC<DashboardProps> = forwardRef<
       <div className='flex w-2/3 flex-wrap content-start items-start justify-start gap-2'>
         <NewWorkoutButton />
         <WorkoutFromTemplateButton />
+        <PlannedWorkoutsButton />
         <YourProfileButton />
         <ChallengesButton />
         <StatsButton />
