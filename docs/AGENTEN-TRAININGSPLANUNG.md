@@ -110,3 +110,8 @@ Der implementierte OAuth-/MCP-Ablauf ist unabhängig per HTTP und Browser geprü
 
 - https://nextjs.org/blog/august-2026-security-release
 - https://supabase.com/docs/guides/platform/ssl-enforcement
+
+Geschäftliche Revisions-/Idempotenzkonflikte verwenden `PT409`, nicht PostgreSQLs
+transientes `40001`. So lösen sie keine automatischen PostgREST-Transaktions-Retries
+aus. Migration 004 korrigiert diese Live-Kompatibilität gezielt.
+Quelle: https://supabase.com/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b

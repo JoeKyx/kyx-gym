@@ -71,7 +71,7 @@ export async function rpc(
         ? 403
         : error.code === 'P0002'
         ? 404
-        : ['40001', '23505'].includes(error.code)
+        : ['PT409', '40001', '23505'].includes(error.code)
         ? 409
         : error.code === 'PGRST202'
         ? 503

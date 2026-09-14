@@ -26,6 +26,12 @@ await db.exec(
     'utf8'
   )
 );
+await db.exec(
+  readFileSync(
+    'supabase/migrations/202609140004_explicit_conflict_errors.sql',
+    'utf8'
+  )
+);
 const alice = '00000000-0000-4000-8000-000000000001',
   bob = '00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users values ($1),($2)', [alice, bob]);
@@ -60,6 +66,16 @@ const plan = {
     },
   ],
 };
+const functionDefinition = (
+  await db.query(
+    "select pg_get_functiondef('public.gym_agent_execute(text,jsonb,uuid,text)'::regprocedure) as definition"
+  )
+).rows[0].definition;
+assert.ok(
+  !functionDefinition.includes("errcode='40001'"),
+  'Business conflicts must never trigger PostgREST transaction retries'
+);
+assert.ok(functionDefinition.includes("errcode='PT409'"));
 let passed = 0;
 async function check(name, fn) {
   await fn();
