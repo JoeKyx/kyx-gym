@@ -1,13 +1,13 @@
 import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
-export async function POST(_req: NextRequest, _response: NextResponse) {
+export async function POST() {
   const options = {
     name: 'session',
     value: '',
     maxAge: -1,
   };
 
-  cookies().set(options);
+  (await cookies()).set(options);
   return NextResponse.json({}, { status: 200 });
 }

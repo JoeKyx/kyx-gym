@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdviceForUser } from '@/lib/adviceAi';
 import logger from '@/lib/logger';
+import { syncCookies } from '@/lib/supabase-cookie-adapter';
 
 import { Database } from '@/types/supabase';
 export const dynamic = 'force-dynamic';
@@ -13,17 +14,17 @@ export const runtime = 'edge';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { userid: string } }
+  context: { params: Promise<{ userid: string }> }
 ) {
   const dev = process.env.NODE_ENV === 'development';
   logger('inc request');
 
-  const userid = context.params.userid;
+  const userid = (await context.params).userid;
   logger(userid, 'userid');
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const supabase = createServerComponentClient<Database>({
-    cookies: () => cookieStore,
+    cookies: syncCookies(cookieStore),
   });
 
   const { data, error } = await supabase
@@ -93,6 +94,9 @@ export async function GET(
       });
     }
   } else {
-    return { status: 403 };
+    return NextResponse.json(
+      { error: 'Advice is available again after three days.' },
+      { status: 403 }
+    );
   }
 }

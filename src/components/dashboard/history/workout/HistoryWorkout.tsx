@@ -7,6 +7,9 @@ import { cn } from '@/lib';
 import { useProfile } from '@/components/context/ProfileContext';
 import HistoryWorkoutHeadArea from '@/components/dashboard/history/workout/HistoryWorkoutHeadArea';
 import HistoryWorkoutItem from '@/components/dashboard/history/workout/HistoryWorkoutItem';
+import { useIntegrationsEnabled } from '@/components/integrations/IntegrationAvailability';
+import WorkoutFeedback from '@/components/integrations/WorkoutFeedback';
+import WorkoutPlanComparison from '@/components/integrations/WorkoutPlanComparison';
 
 import { HistoryWorkout } from '@/types/Workout';
 
@@ -26,9 +29,16 @@ const HistoryWorkout: FC<HistoryWorkoutProps> = forwardRef<
   const owner = profileContext.userProfile;
 
   const isOwn = profileContext.isOwn;
+  const integrationsEnabled = useIntegrationsEnabled();
 
   return (
     <div className={cn('flex flex-col gap-4', className)} ref={ref} {...rest}>
+      {integrationsEnabled && isOwn && workout.status === 'finished' && (
+        <>
+          <WorkoutPlanComparison workoutId={workout.id} />
+          <WorkoutFeedback workoutId={workout.id} />
+        </>
+      )}
       <HistoryWorkoutHeadArea
         workout={workoutState}
         isOwn={isOwn}

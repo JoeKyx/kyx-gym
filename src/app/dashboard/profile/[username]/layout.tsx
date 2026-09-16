@@ -2,6 +2,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
 import logger from '@/lib/logger';
+import { syncCookies } from '@/lib/supabase-cookie-adapter';
 
 import { ProfileProvider } from '@/components/context/ProfileContext';
 
@@ -9,16 +10,21 @@ import { Database } from '@/types/supabase';
 
 interface pageProps {
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 }
 export const dynamic = 'force-dynamic';
 
-export default async function Layout({ params, children }: pageProps) {
+export default async function Layout(props: pageProps) {
+  const cookieStore = await cookies();
+  const params = await props.params;
+
+  const { children } = props;
+
   const loadUserProfile = async () => {
     const supabase = createServerComponentClient<Database>({
-      cookies,
+      cookies: syncCookies(cookieStore),
     });
     // Make %20 to space
     params.username = params.username.replace(/%20/g, ' ');
@@ -47,7 +53,7 @@ export default async function Layout({ params, children }: pageProps) {
 
   const loadWorkouts = async () => {
     const supabase = createServerComponentClient<Database>({
-      cookies,
+      cookies: syncCookies(cookieStore),
     });
     const { data, error } = await supabase
       .from('workouts')
