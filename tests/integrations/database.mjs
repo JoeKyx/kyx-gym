@@ -39,7 +39,7 @@ await db.exec(
   )
 );
 await db.exec(
-  readFileSync('supabase/migrations/20260916190000_cardio_sessions.sql', 'utf8')
+  readFileSync('supabase/migrations/20260916180415_cardio_sessions.sql', 'utf8')
 );
 const alice = '00000000-0000-4000-8000-000000000001',
   bob = '00000000-0000-4000-8000-000000000002';
