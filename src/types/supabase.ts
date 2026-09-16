@@ -565,6 +565,9 @@ export interface Database {
       };
       sets: {
         Row: {
+          // Additive planning migration; optional until remote type regeneration.
+          target_weight?: number | null;
+          target_reps?: number | null;
           distance: number | null;
           finished_at: string | null;
           id: number;

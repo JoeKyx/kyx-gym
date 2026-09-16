@@ -142,218 +142,232 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
   };
 
   return (
-    <div className='mt-2 flex items-center justify-between gap-5'>
-      <div className='flex items-center gap-3'>
-        <span className='text-primary-500 hidden font-semibold md:block'>
-          {setIndex + 1}
-        </span>
+    <div>
+      {set.target_reps != null && (
+        <p className='mt-3 text-sm text-teal-800'>
+          Vorgabe: {set.target_weight} kg × {set.target_reps} Wdh. ·{' '}
+          {set.is_finished
+            ? `Bestätigt: ${set.weight} kg × ${set.reps} Wdh.`
+            : 'Noch nicht bestätigt'}
+        </p>
+      )}
+      <div className='mt-2 flex items-center justify-between gap-5'>
+        <div className='flex items-center gap-3'>
+          <span className='text-primary-500 hidden font-semibold md:block'>
+            {setIndex + 1}
+          </span>
 
-        <TypeDisplay
-          className='block md:hidden'
-          locked={false}
-          set={set}
-          onSetChange={(newType) => handleSetTypeChange(set, newType)}
-        />
-        {workoutItem.exercises?.type === 'weight' && (
-          <>
-            <input
-              type='text' // Change to text input
-              inputMode='decimal' // Optimize keyboard for mobile devices
-              placeholder='KG'
-              value={inputValues[set.id]?.weight || ''}
-              onChange={(e) => {
-                logger(e.target.value, 'e.target.value');
-                // Replace commas with dots, then filter the value for valid decimal inputs
-                let value = e.target.value
-                  .replace(/,/g, '.')
-                  .replace(/[^0-9.]/g, '');
-                logger(value, 'value');
-                // Only allow one dot
-                const dotIndex = value.indexOf('.');
-                if (dotIndex !== -1) {
-                  value = `${value.substring(0, dotIndex + 1)}${value
-                    .substring(dotIndex + 1)
-                    .replace(/\./g, '')}`;
-                }
-                handleInputChange(set, 'weight', value);
-              }}
-              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-              disabled={set.is_finished}
-            />
-            <input
-              type='text' // Change to text input
-              inputMode='decimal' // Optimize keyboard for mobile devices
-              // Allow only digits
-              placeholder='Reps'
-              value={inputValues[set.id]?.reps || ''}
-              onChange={(e) => {
-                // Replace commas with dots, then filter the value for valid decimal inputs
-                let value = e.target.value
-                  .replace(/,/g, '.')
-                  .replace(/[^0-9.]/g, '');
-                // Only allow one dot
-                const dotIndex = value.indexOf('.');
-                if (dotIndex !== -1) {
-                  value = `${value.substring(0, dotIndex + 1)}${value
-                    .substring(dotIndex + 1)
-                    .replace(/\./g, '')}`;
-                }
-                handleInputChange(set, 'reps', value);
-              }}
-              className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-              disabled={set.is_finished}
-            />
-          </>
-        )}
-        {workoutItem.exercises?.type === 'speed' && (
-          <>
-            <input
-              type='text' // Change to text input
-              inputMode='decimal' // Optimize keyboard for mobile devices
-              // Allow only digits
-              placeholder='Minutes'
-              value={inputValues[set.id]?.speed || ''}
-              onChange={(e) => {
-                // Replace commas with dots, then filter the value for valid decimal inputs
-                let value = e.target.value
-                  .replace(/,/g, '.')
-                  .replace(/[^0-9.]/g, '');
-                // Only allow one dot
-                const dotIndex = value.indexOf('.');
-                if (dotIndex !== -1) {
-                  value = `${value.substring(0, dotIndex + 1)}${value
-                    .substring(dotIndex + 1)
-                    .replace(/\./g, '')}`;
-                }
-                handleInputChange(set, 'speed', value);
-              }}
-              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-              disabled={set.is_finished}
-            />
-            <input
-              type='text' // Change to text input
-              inputMode='decimal' // Optimize keyboard for mobile devices
-              // Allow only digits
-              placeholder='Kilometers'
-              value={inputValues[set.id]?.distance || ''}
-              onChange={(e) => {
-                // Replace commas with dots, then filter the value for valid decimal inputs
-                let value = e.target.value
-                  .replace(/,/g, '.')
-                  .replace(/[^0-9.]/g, '');
-                // Only allow one dot
-                const dotIndex = value.indexOf('.');
-                if (dotIndex !== -1) {
-                  value = `${value.substring(0, dotIndex + 1)}${value
-                    .substring(dotIndex + 1)
-                    .replace(/\./g, '')}`;
-                }
-                handleInputChange(set, 'distance', value);
-              }}
-              className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-              disabled={set.is_finished}
-            />
-          </>
-        )}
-        {workoutItem.exercises?.type === 'other' && (
-          <>
-            <input
-              type='text' // Change to text input
-              inputMode='decimal' // Optimize keyboard for mobile devices
-              // Allow only digits
-
-              placeholder='Reps'
-              value={inputValues[set.id]?.reps || ''}
-              onChange={(e) => {
-                // Replace commas with dots, then filter the value for valid decimal inputs
-                let value = e.target.value
-                  .replace(/,/g, '.')
-                  .replace(/[^0-9.]/g, '');
-                // Only allow one dot
-                const dotIndex = value.indexOf('.');
-                if (dotIndex !== -1) {
-                  value = `${value.substring(0, dotIndex + 1)}${value
-                    .substring(dotIndex + 1)
-                    .replace(/\./g, '')}`;
-                }
-                handleInputChange(set, 'reps', value);
-              }}
-              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-              disabled={set.is_finished}
-            />
-          </>
-        )}
-        {workoutItem.exercises?.type === 'time' && (
-          <>
-            <input
-              type='text' // Change to text input
-              inputMode='decimal' // Optimize keyboard for mobile devices
-              // Allow only digits
-              placeholder='Minutes'
-              value={inputValues[set.id]?.speed || ''}
-              onChange={(e) => {
-                // Replace commas with dots, then filter the value for valid decimal inputs
-                let value = e.target.value
-                  .replace(/,/g, '.')
-                  .replace(/[^0-9.]/g, '');
-                // Only allow one dot
-                const dotIndex = value.indexOf('.');
-                if (dotIndex !== -1) {
-                  value = `${value.substring(0, dotIndex + 1)}${value
-                    .substring(dotIndex + 1)
-                    .replace(/\./g, '')}`;
-                }
-                handleInputChange(set, 'speed', value);
-              }}
-              className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
-              disabled={set.is_finished}
-            />
-          </>
-        )}
-
-        <TypeDisplay
-          className='hidden md:block'
-          locked={false}
-          set={set}
-          onSetChange={(newType) => handleSetTypeChange(set, newType)}
-        />
-
-        <div className='flex flex-grow items-center'>
-          {set.previous_set &&
-            workoutItem.exercises?.type === 'weight' &&
-            set.previous_set.id != set.id && (
-              <span className='text-start text-xs text-gray-500'>
-                {set.previous_set.weight} KG x {set.previous_set.reps}
-              </span>
-            )}
-          <RecordFlame
-            isWeight={isHighestInWeight()}
-            isVolume={isHighestInVolume()}
-            mode='active'
+          <TypeDisplay
+            className='block md:hidden'
+            locked={false}
+            set={set}
+            onSetChange={(newType) => handleSetTypeChange(set, newType)}
           />
-        </div>
-      </div>
-      <div className='flex items-center justify-between gap-2'>
-        <div className='flex items-center'>
-          {set.is_finished ? (
-            <CheckSquare
-              className='text-primary-500 cursor-pointer'
-              onClick={() => handleSetFinish(set)}
-              size={25}
-            />
-          ) : (
-            <Square
-              className='text-primary-500 cursor-pointer'
-              onClick={() => handleSetFinish(set)}
-              size={25}
-            />
+          {workoutItem.exercises?.type === 'weight' && (
+            <>
+              <input
+                type='text' // Change to text input
+                inputMode='decimal' // Optimize keyboard for mobile devices
+                placeholder='KG'
+                value={inputValues[set.id]?.weight ?? ''}
+                onChange={(e) => {
+                  logger(e.target.value, 'e.target.value');
+                  // Replace commas with dots, then filter the value for valid decimal inputs
+                  let value = e.target.value
+                    .replace(/,/g, '.')
+                    .replace(/[^0-9.]/g, '');
+                  logger(value, 'value');
+                  // Only allow one dot
+                  const dotIndex = value.indexOf('.');
+                  if (dotIndex !== -1) {
+                    value = `${value.substring(0, dotIndex + 1)}${value
+                      .substring(dotIndex + 1)
+                      .replace(/\./g, '')}`;
+                  }
+                  handleInputChange(set, 'weight', value);
+                }}
+                className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+                disabled={set.is_finished}
+              />
+              <input
+                type='text' // Change to text input
+                inputMode='decimal' // Optimize keyboard for mobile devices
+                // Allow only digits
+                placeholder='Reps'
+                value={inputValues[set.id]?.reps ?? ''}
+                onChange={(e) => {
+                  // Replace commas with dots, then filter the value for valid decimal inputs
+                  let value = e.target.value
+                    .replace(/,/g, '.')
+                    .replace(/[^0-9.]/g, '');
+                  // Only allow one dot
+                  const dotIndex = value.indexOf('.');
+                  if (dotIndex !== -1) {
+                    value = `${value.substring(0, dotIndex + 1)}${value
+                      .substring(dotIndex + 1)
+                      .replace(/\./g, '')}`;
+                  }
+                  handleInputChange(set, 'reps', value);
+                }}
+                className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+                disabled={set.is_finished}
+              />
+            </>
           )}
+          {workoutItem.exercises?.type === 'speed' && (
+            <>
+              <input
+                type='text' // Change to text input
+                inputMode='decimal' // Optimize keyboard for mobile devices
+                // Allow only digits
+                placeholder='Minutes'
+                value={inputValues[set.id]?.speed || ''}
+                onChange={(e) => {
+                  // Replace commas with dots, then filter the value for valid decimal inputs
+                  let value = e.target.value
+                    .replace(/,/g, '.')
+                    .replace(/[^0-9.]/g, '');
+                  // Only allow one dot
+                  const dotIndex = value.indexOf('.');
+                  if (dotIndex !== -1) {
+                    value = `${value.substring(0, dotIndex + 1)}${value
+                      .substring(dotIndex + 1)
+                      .replace(/\./g, '')}`;
+                  }
+                  handleInputChange(set, 'speed', value);
+                }}
+                className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+                disabled={set.is_finished}
+              />
+              <input
+                type='text' // Change to text input
+                inputMode='decimal' // Optimize keyboard for mobile devices
+                // Allow only digits
+                placeholder='Kilometers'
+                value={inputValues[set.id]?.distance || ''}
+                onChange={(e) => {
+                  // Replace commas with dots, then filter the value for valid decimal inputs
+                  let value = e.target.value
+                    .replace(/,/g, '.')
+                    .replace(/[^0-9.]/g, '');
+                  // Only allow one dot
+                  const dotIndex = value.indexOf('.');
+                  if (dotIndex !== -1) {
+                    value = `${value.substring(0, dotIndex + 1)}${value
+                      .substring(dotIndex + 1)
+                      .replace(/\./g, '')}`;
+                  }
+                  handleInputChange(set, 'distance', value);
+                }}
+                className='focus:border-primary disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+                disabled={set.is_finished}
+              />
+            </>
+          )}
+          {workoutItem.exercises?.type === 'other' && (
+            <>
+              <input
+                type='text' // Change to text input
+                inputMode='decimal' // Optimize keyboard for mobile devices
+                // Allow only digits
+
+                placeholder='Reps'
+                value={inputValues[set.id]?.reps ?? ''}
+                onChange={(e) => {
+                  // Replace commas with dots, then filter the value for valid decimal inputs
+                  let value = e.target.value
+                    .replace(/,/g, '.')
+                    .replace(/[^0-9.]/g, '');
+                  // Only allow one dot
+                  const dotIndex = value.indexOf('.');
+                  if (dotIndex !== -1) {
+                    value = `${value.substring(0, dotIndex + 1)}${value
+                      .substring(dotIndex + 1)
+                      .replace(/\./g, '')}`;
+                  }
+                  handleInputChange(set, 'reps', value);
+                }}
+                className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+                disabled={set.is_finished}
+              />
+            </>
+          )}
+          {workoutItem.exercises?.type === 'time' && (
+            <>
+              <input
+                type='text' // Change to text input
+                inputMode='decimal' // Optimize keyboard for mobile devices
+                // Allow only digits
+                placeholder='Minutes'
+                value={inputValues[set.id]?.speed || ''}
+                onChange={(e) => {
+                  // Replace commas with dots, then filter the value for valid decimal inputs
+                  let value = e.target.value
+                    .replace(/,/g, '.')
+                    .replace(/[^0-9.]/g, '');
+                  // Only allow one dot
+                  const dotIndex = value.indexOf('.');
+                  if (dotIndex !== -1) {
+                    value = `${value.substring(0, dotIndex + 1)}${value
+                      .substring(dotIndex + 1)
+                      .replace(/\./g, '')}`;
+                  }
+                  handleInputChange(set, 'speed', value);
+                }}
+                className='focus:border-primary-600 disabled:bg-primary-200 w-14 rounded border p-2 transition-all duration-200 ease-in-out focus:outline-none disabled:opacity-50 md:w-24'
+                disabled={set.is_finished}
+              />
+            </>
+          )}
+
+          <TypeDisplay
+            className='hidden md:block'
+            locked={false}
+            set={set}
+            onSetChange={(newType) => handleSetTypeChange(set, newType)}
+          />
+
+          <div className='flex flex-grow items-center'>
+            {set.previous_set &&
+              workoutItem.exercises?.type === 'weight' &&
+              set.previous_set.id != set.id && (
+                <span className='text-start text-xs text-gray-500'>
+                  {set.previous_set.weight} KG x {set.previous_set.reps}
+                </span>
+              )}
+            <RecordFlame
+              isWeight={isHighestInWeight()}
+              isVolume={isHighestInVolume()}
+              mode='active'
+            />
+          </div>
         </div>
-        <div
-          className='flex h-5 w-5 cursor-pointer items-center justify-center rounded-sm border border-black bg-red-600 p-2 text-white'
-          onClick={() => activeWorkoutContext.deleteSet(set.id)}
-        >
-          <span>X</span>
+        <div className='flex items-center justify-between gap-2'>
+          <button
+            type='button'
+            className='text-primary-500 rounded p-2'
+            aria-label={
+              set.is_finished
+                ? `Satz ${setIndex + 1} wieder öffnen`
+                : `Satz ${setIndex + 1} bestätigen`
+            }
+            aria-pressed={set.is_finished}
+            onClick={() => handleSetFinish(set)}
+          >
+            {set.is_finished ? (
+              <CheckSquare aria-hidden size={25} />
+            ) : (
+              <Square aria-hidden size={25} />
+            )}
+          </button>
+          <button
+            type='button'
+            aria-label={`Satz ${setIndex + 1} entfernen`}
+            className='rounded border border-red-700 px-2 text-red-700'
+            onClick={() => activeWorkoutContext.deleteSet(set.id)}
+          >
+            ×
+          </button>
         </div>
       </div>
     </div>

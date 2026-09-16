@@ -119,7 +119,7 @@ export function ActiveWorkoutProvider({
   workout_id,
 }: {
   children: ReactNode;
-  workout_id: string | number;
+  workout_id: number;
 }) {
   const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
   const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
@@ -355,32 +355,28 @@ export function ActiveWorkoutProvider({
   };
 
   const updateSet = async (set: Set) => {
-    logger(set, 'updating set');
     if (!activeWorkout)
-      return { success: false, message: 'Error updating set' };
-    const newWorkout = { ...activeWorkout };
-    const newWorkoutItems = newWorkout.workout_items.map((item) => {
-      const setItems = item.sets.map((itemSet) => {
-        if (itemSet.id === set.id) {
-          return set;
-        } else {
-          return itemSet;
-        }
-      });
-      return { ...item, sets: setItems };
-    });
-    newWorkout.workout_items = newWorkoutItems;
-
-    setActiveWorkout(newWorkout);
-
-    // Update workout in DB
+      return { success: false, message: 'Kein aktives Workout.' };
     const res = await updateSetInDB(set.id, set);
-    if (res.success)
-      return { success: true, message: 'Successfully updated set' };
-    else {
-      setError(res.error);
-      return { success: false, message: 'Error updating set' };
-    }
+    if (!res.success)
+      return {
+        success: false,
+        message: res.error || 'Satz konnte nicht gespeichert werden.',
+      };
+    setActiveWorkout((current) =>
+      current
+        ? {
+            ...current,
+            workout_items: current.workout_items.map((item) => ({
+              ...item,
+              sets: item.sets.map((existing) =>
+                existing.id === set.id ? { ...existing, ...res.data } : existing
+              ),
+            })),
+          }
+        : current
+    );
+    return { success: true, message: 'Satz gespeichert.' };
   };
 
   const updateWorkoutName = async (name: string) => {

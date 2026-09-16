@@ -14,16 +14,14 @@ export default function AuthForm() {
 
   // on user Login redirect to dashboard
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        logger(event, 'event');
-        logger(session, 'session');
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+      logger(event, 'event');
+      // Never log auth sessions or access tokens.
 
-        if (event === 'SIGNED_IN') {
-          window.location.href = '/dashboard';
-        }
+      if (event === 'SIGNED_IN') {
+        window.location.href = '/api/oauth/resume';
       }
-    );
+    });
 
     return () => {
       authListener?.subscription.unsubscribe();

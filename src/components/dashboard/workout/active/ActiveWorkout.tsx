@@ -8,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { HTMLAttributes } from 'react';
@@ -70,6 +71,10 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
     useState<boolean>(false);
   const [finishedWorkoutLoading, setFinishedWorkoutLoading] =
     useState<boolean>(false);
+  const savingSets = useRef(
+    new Map<number, Promise<{ success: boolean; message: string }>>()
+  );
+  const finishing = useRef(false);
   const [error, setError] = useState<string>('');
   const router = useRouter();
 
@@ -85,10 +90,14 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
             newInputValues[set.id] = {
               weight:
                 prevInputValues[set.id]?.weight ??
-                (set.weight !== null ? set.weight : undefined),
+                set.weight ??
+                (!set.is_finished ? set.target_weight : undefined) ??
+                undefined,
               reps:
                 prevInputValues[set.id]?.reps ??
-                (set.reps !== null ? set.reps : undefined),
+                set.reps ??
+                (!set.is_finished ? set.target_reps : undefined) ??
+                undefined,
               distance:
                 prevInputValues[set.id]?.distance ??
                 (set.distance !== null ? set.distance : undefined),
@@ -149,24 +158,51 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
     setInputValues({ ...inputValues, [set.id]: newValues });
   };
 
-  const handleSetFinish = (set: Set) => {
-    const weight = inputValues[set.id]?.weight ?? null;
-    const reps = inputValues[set.id]?.reps ?? null;
-    const speed = inputValues[set.id]?.speed ?? null;
-    const distance = inputValues[set.id]?.distance ?? null;
-    set.weight = weight !== undefined ? weight : null;
-    set.reps = reps !== undefined ? reps : null;
-    set.speed = speed !== undefined ? speed : null;
-    set.distance = distance !== undefined ? distance : null;
-    set.is_finished = !set.is_finished;
-    // TODO: Play sound
-    activeWorkoutContext.updateSet(set);
+  const persistSet = async (set: Set) => {
+    if (finishing.current || savingSets.current.has(set.id)) return;
+    const pending = activeWorkoutContext.updateSet(set);
+    savingSets.current.set(set.id, pending);
+    try {
+      const result = await pending;
+      if (!result.success) setError(result.message);
+    } finally {
+      savingSets.current.delete(set.id);
+    }
   };
-
+  const handleSetFinish = (set: Set) => {
+    const values = inputValues[set.id] || {};
+    const numberOrNull = (value: unknown) =>
+      value === '' || value == null ? null : Number(value);
+    const updated = {
+      ...set,
+      weight: numberOrNull(values.weight),
+      reps: numberOrNull(values.reps),
+      speed: numberOrNull(values.speed),
+      distance: numberOrNull(values.distance),
+      is_finished: !set.is_finished,
+    };
+    if (
+      [updated.weight, updated.reps, updated.speed, updated.distance].some(
+        (v) => v !== null && (!Number.isFinite(v) || v < 0)
+      )
+    ) {
+      setError('Bitte gültige Satzwerte eingeben.');
+      return;
+    }
+    if (
+      updated.is_finished &&
+      set.target_reps != null &&
+      (updated.reps == null ||
+        updated.weight == null ||
+        !Number.isInteger(updated.reps))
+    ) {
+      setError('Bitte tatsächliches Gewicht und Wiederholungen bestätigen.');
+      return;
+    }
+    void persistSet(updated);
+  };
   const handleSetTypeChange = (set: Set, type: Set['type']) => {
-    // Update locally
-    const newSet = { ...set, type };
-    activeWorkoutContext.updateSet(newSet);
+    void persistSet({ ...set, type });
   };
 
   const handleAddSet = async (item: WorkoutItem) => {
@@ -185,6 +221,8 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       return;
     }
 
+    if (finishing.current) return;
+    finishing.current = true;
     const workoutId = workout.id;
     const username = socialContext?.userProfile?.username;
 
@@ -194,6 +232,13 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
     setFinishedWorkoutLoading(true);
 
     try {
+      const saves = await Promise.all([...savingSets.current.values()]);
+      if (saves.some((save) => !save.success)) {
+        setError(
+          'Ein Satz konnte nicht gespeichert werden. Bitte erneut bestätigen.'
+        );
+        return;
+      }
       const res = await activeWorkoutContext.finishWorkout();
       if (!res.success) {
         setError(res.message);
@@ -211,6 +256,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       logger(finishError, 'Unexpected error finishing workout');
       setError('Unable to finish workout. Please try again.');
     } finally {
+      finishing.current = false;
       setFinishedWorkoutLoading(false);
     }
   };

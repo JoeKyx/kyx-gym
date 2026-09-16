@@ -3,38 +3,53 @@ on:
   push:
     branches:
       - main
+      - feat/agent-training-plans
   pull_request: {}
 
 concurrency:
-  group: ${{ github.job }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   lint:
-    name: ⬣ ESLint, ʦ TypeScript, 💅 Prettier, and 🃏 Test
+    name: Lint, types, format, tests and build
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:55439
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: fixture-anon
+      SERVICE_ROLE_KEY: fixture-service
+      MCP_PUBLIC_URL: http://localhost:3017/api/mcp
+      NEXT_OPEN_AI_API_KEY: fixture-no-paid-calls
+      KYX_TEST_CONTAINER_RUNTIME: docker
     steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v2
-
-      - name: ⎔ Setup node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
-
-      - name: 📥 Download deps
-        uses: u0reo/npm-install@fix/restore-failure
-        with:
-          useRollingCache: true
-
-      - name: 🔬 Lint
-        run: yarn lint:strict
-
-      - name: 🔎 Type check
-        run: yarn typecheck
-
-      - name: 💅 Prettier check
-        run: yarn format:check
-
-      - name: 🃏 Run jest
-        run: yarn test
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:strict
+      - run: npm run typecheck
+      - run: npm run format:check
+      - run: npm test -- --runInBand
+      - name: PostgreSQL integration tests
+        run: |
+          docker run -d --name kyx-gym-agent-test-db -e POSTGRES_PASSWORD=local-test-only --health-cmd='pg_isready -h 127.0.0.1 -U postgres' --health-interval=1s --health-timeout=3s --health-retries=30 postgres:16-alpine
+          for i in $(seq 1 30); do
+            if docker exec kyx-gym-agent-test-db pg_isready -h 127.0.0.1 -U postgres; then break; fi
+            sleep 1
+          done
+          KYX_TEST_POSTGRES=1 node tests/integrations/database.mjs
+      - run: npm run build
+      - name: HTTP OAuth and MCP tests
+        run: |
+          node tests/integrations/http-fixture.mjs > /tmp/kyx-fixture.log 2>&1 &
+          npm run start -- -p3017 > /tmp/kyx-next.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://localhost:3017/.well-known/oauth-protected-resource > /dev/null; then break; fi
+            sleep 1
+          done
+          node tests/integrations/http.mjs
+      - name: Stop test database
+        if: always()
+        run: docker rm -f kyx-gym-agent-test-db || true

@@ -7,6 +7,7 @@ import { cn } from '@/lib';
 
 import { useSocial } from '@/components/context/SocialContext';
 import MobileImageButton from '@/components/dashboard/mobile/MobileImageButton';
+import ConnectionsLink from '@/components/integrations/ConnectionsLink';
 
 type ProfileTabProps = HTMLAttributes<HTMLDivElement>;
 
@@ -50,6 +51,7 @@ const ProfileTab: FC<ProfileTabProps> = forwardRef<
         }
         onClickHandler={onYourProfileClick}
       />
+      <ConnectionsLink />
       <MobileImageButton
         title='History'
         image='/images/dashboard/historyMobile.jpeg'

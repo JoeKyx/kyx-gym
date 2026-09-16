@@ -9,6 +9,8 @@ import logger from '@/lib/logger';
 
 import { useProfile } from '@/components/context/ProfileContext';
 import { useSocial } from '@/components/context/SocialContext';
+import { useIntegrationsEnabled } from '@/components/integrations/IntegrationAvailability';
+import PlannedWorkouts from '@/components/integrations/PlannedWorkouts';
 import { Calendar } from '@/components/ui/Calendar';
 
 import { DBCalendar, DBWorkout } from '@/types/Workout';
@@ -20,6 +22,7 @@ const GymCalendar: FC<GymCalendarProps> = forwardRef<
   GymCalendarProps
 >((props, ref) => {
   const { className, ...rest } = props;
+  const integrationsEnabled = useIntegrationsEnabled();
 
   const [clickedOnDate, setClickedOnDate] = useState<Date | null>(null);
   const [filteredWorkouts, setFilteredWorkouts] = useState<DBWorkout[]>([]);
@@ -157,6 +160,9 @@ const GymCalendar: FC<GymCalendarProps> = forwardRef<
         }}
       />
       <CalendarAction date={clickedOnDate} />
+      {integrationsEnabled && isOwn && clickedOnDate && (
+        <PlannedWorkouts compact selectedDate={clickedOnDate} />
+      )}
     </div>
   );
 });

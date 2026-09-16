@@ -12,6 +12,7 @@ import {
 import { useSocial } from '@/components/context/SocialContext';
 import MobileImageButton from '@/components/dashboard/mobile/MobileImageButton';
 import WorkoutInProgressModal from '@/components/dashboard/modals/WorkoutInProgressModal';
+import { useIntegrationsEnabled } from '@/components/integrations/IntegrationAvailability';
 
 type WorkoutTabProps = HTMLAttributes<HTMLDivElement>;
 
@@ -22,6 +23,7 @@ const WorkoutTab: FC<WorkoutTabProps> = forwardRef<
   const { className, ...rest } = props;
 
   const router = useRouter();
+  const integrationsEnabled = useIntegrationsEnabled();
 
   const [loadingNewWorkout, setLoadingNewWorkout] = useState(false);
   const [newWorkoutText, setNewWorkoutText] = useState('New Workout');
@@ -112,6 +114,18 @@ const WorkoutTab: FC<WorkoutTabProps> = forwardRef<
         title='Workout from Template'
         image='/images/dashboard/workoutFromTemplateMobile.jpeg'
         onClickHandler={onWorkoutFromTemplateClick}
+      />
+      {integrationsEnabled && (
+        <MobileImageButton
+          title='Geplante Workouts'
+          image='/images/dashboard/historyMobile.jpeg'
+          onClickHandler={() => router.push('/dashboard/plans')}
+        />
+      )}
+      <MobileImageButton
+        title='Ausdauer & Intervalle'
+        image='/images/dashboard/workoutFromTemplateMobile.jpeg'
+        onClickHandler={() => router.push('/dashboard/cardio')}
       />
       <MobileImageButton
         title='Challenges'
