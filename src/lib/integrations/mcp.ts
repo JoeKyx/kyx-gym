@@ -73,9 +73,9 @@ const descriptions: Partial<Record<Operation, string>> = {
   get_workout:
     'Eigenes Workout mit ursprünglichem Plan und Feedback. Items nach ID paginiert: after = letzte Item-ID. Je Item erste 50 Sätze, weitere über get_workout_sets. actual=null bedeutet nicht bestätigt.',
   exercise_history:
-    'Bestätigte Ausführungen dieser exakten Übungsversion, neueste zuerst nach Workout-Beginn und Workout-Item-ID. Jede Ausführung ist ein Workout-Item mit Datum und allen bestätigten Sätzen inklusive Gewicht, Wiederholungen, Tempo, Distanz und Anstrengung (0–10 oder null). Optional limit = Anzahl Ausführungen, maximal 50, Standard 20. Ohne limit alle Seiten abrufen: after = workout_item_id des letzten Ergebnisses; ein leeres Array beendet die Liste. Andere Übungsversionen separat abfragen; get_exercise zeigt Versions-IDs.',
+    'Bestätigte Ausführungen der gewählten Übung über alle eigenen, zugänglichen Versionen hinweg, neueste zuerst nach Workout-Beginn und Workout-Item-ID. Über search_exercises den Namen suchen und die aktuelle exercise_id verwenden; jede Ausführung enthält ihre tatsächliche exercise_id und alle bestätigten Satzwerte einschließlich Anstrengung. Ohne limit werden alle Ausführungen zurückgegeben. Mit limit (1–50) kommen genau die neuesten N Ausführungen; bei Bedarf nachfolgende mit after = workout_item_id des letzten Ergebnisses lesen. Ein leeres Array beendet die Liste.',
   search_exercises:
-    'Öffentliche und eigene Übungen suchen. Aktuelle Versionen; keine fremden privaten Übungen. Pagination: after = letzte ID.',
+    'Öffentliche und eigene Übungen nach aktuellem oder früherem Namen suchen. Ergebnis ist die aktuelle Versions-ID; keine fremden privaten Übungen. Pagination: after = letzte ID.',
   list_plans:
     'Eigene Trainingspläne mit Revision und Startstatus. Pagination: after = letzte ID.',
   get_plan: 'Eigener Trainingsplan einschließlich Vorgaben und Begründung.',
