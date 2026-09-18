@@ -47,6 +47,12 @@ await db.exec(
     'utf8'
   )
 );
+await db.exec(
+  readFileSync(
+    'supabase/migrations/20260918041208_exercise_history_all_versions.sql',
+    'utf8'
+  )
+);
 const alice = '00000000-0000-4000-8000-000000000001',
   bob = '00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users values ($1),($2)', [alice, bob]);
@@ -654,6 +660,96 @@ await check(
       sets.map((set) => set.actual.effort),
       [8.5, null]
     );
+  }
+);
+await check(
+  'Exercise search resolves version families; no limit returns all and limit ten returns ten',
+  async () => {
+    const owner = '00000000-0000-4000-8000-000000000005';
+    await db.query('insert into auth.users values ($1)', [owner]);
+    await db.query(
+      `insert into exercises(id,name,type,public,userid) values
+      (9901,'Bench Legacy','weight',false,$1),
+      (9902,'Bench Archive','weight',false,$1)`,
+      [owner]
+    );
+    await db.query('insert into gym_exercise_versions values (9901,9902)');
+    await db.query(
+      `insert into workouts(id,name,status,userid,created_at)
+      select 10000+g,'Workout '||g,'finished',$1,('2026-04-01'::date+g)::timestamptz
+      from generate_series(1,25) g`,
+      [owner]
+    );
+    await db.query(
+      `insert into workout_items(id,exerciseid,position,workout,is_finished)
+      select 11000+g,case when g<=10 then 9901 else 9902 end,1,10000+g,true
+      from generate_series(1,25) g`
+    );
+    await db.query(
+      `insert into sets(userid,workout_id,workout_item_id,position,type,is_finished,weight,reps,effort)
+      select $1,10000+g,11000+g,1,'normal',true,50+g,5,g%11
+      from generate_series(1,25) g`,
+      [owner]
+    );
+    const found = await run(
+      'search_exercises',
+      { query: 'Bench Archive' },
+      owner
+    );
+    assert.deepEqual(
+      found.map((exercise) => exercise.id),
+      [9902]
+    );
+    assert.deepEqual(
+      (await run('search_exercises', { query: 'Bench Legacy' }, owner)).map(
+        (exercise) => exercise.id
+      ),
+      [9902]
+    );
+    assert.equal(
+      (await run('get_exercise', { id: 9902 }, owner)).previous_version_id,
+      9901
+    );
+    assert.equal(
+      (
+        await db.query(
+          "select has_function_privilege('authenticated','public.gym_exercise_family(bigint,uuid)','EXECUTE') as allowed"
+        )
+      ).rows[0].allowed,
+      false
+    );
+    const history = (exercise_id, args = {}) =>
+      run('exercise_history', { exercise_id, ...args }, owner);
+    const all = await history(9902);
+    assert.equal(all.length, 25);
+    assert.deepEqual(
+      all.map((row) => row.workout_item_id),
+      Array.from({ length: 25 }, (_, i) => 11025 - i)
+    );
+    assert.deepEqual(
+      [...new Set(all.map((row) => row.exercise_id))],
+      [9902, 9901]
+    );
+    assert.equal((await history(9901)).length, 25);
+    const latestTen = await history(9902, { limit: 10 });
+    assert.deepEqual(
+      latestTen.map((row) => row.workout_item_id),
+      Array.from({ length: 10 }, (_, i) => 11025 - i)
+    );
+    assert.equal(
+      (
+        await history(9902, {
+          limit: 10,
+          after: latestTen.at(-1).workout_item_id,
+        })
+      ).length,
+      10
+    );
+    assert.deepEqual(
+      await run('exercise_history', { exercise_id: 9902 }, bob),
+      []
+    );
+    await assert.rejects(history(9902, { after: 9401 }));
   }
 );
 console.log(
