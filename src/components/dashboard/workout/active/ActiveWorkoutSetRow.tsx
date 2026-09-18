@@ -18,11 +18,12 @@ interface ActiveWorkoutSetRowProps {
       reps?: number;
       speed?: number;
       distance?: number;
+      effort?: string | number;
     };
   };
   handleInputChange: (
     set: DBSet,
-    field: 'weight' | 'reps' | 'speed' | 'distance',
+    field: 'weight' | 'reps' | 'speed' | 'distance' | 'effort',
     value: string
   ) => void;
   handleSetTypeChange: (set: DBSet, type: DBSet['type']) => void;
@@ -370,6 +371,25 @@ const ActiveWorkoutSetRow: FC<ActiveWorkoutSetRowProps> = ({
           </button>
         </div>
       </div>
+      <label className='mt-1 flex items-center gap-2 text-xs text-gray-500'>
+        <span>Anstrengung (optional)</span>
+        <input
+          type='number'
+          inputMode='decimal'
+          min='0'
+          max='10'
+          step='any'
+          aria-label={`Anstrengung für Satz ${setIndex + 1} von 0 bis 10`}
+          placeholder='0–10'
+          value={inputValues[set.id]?.effort ?? ''}
+          onChange={(event) =>
+            handleInputChange(set, 'effort', event.target.value)
+          }
+          disabled={set.is_finished}
+          className='focus:border-primary-600 disabled:bg-primary-200 w-16 rounded border px-2 py-1 text-sm focus:outline-none disabled:opacity-50'
+        />
+        {set.is_finished && set.effort != null && <span>/ 10</span>}
+      </label>
     </div>
   );
 };

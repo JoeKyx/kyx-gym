@@ -24,6 +24,7 @@ const FakeWorkoutItem: FC<FakeWorkoutItemProps> = forwardRef<
     position: 1,
     type: 'normal',
     speed: 0,
+    effort: null,
   };
 
   return <div className={className} ref={ref} {...rest}></div>;

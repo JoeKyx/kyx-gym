@@ -37,6 +37,9 @@ it('rejects foreign identity, extra fields, non-finite values and unbounded plan
   ).toBe(false);
   expect(inputs.list_workouts.safeParse({ limit: 51 }).success).toBe(false);
   expect(
+    inputs.exercise_history.safeParse({ exercise_id: 1, limit: 51 }).success
+  ).toBe(false);
+  expect(
     inputs.update_plan.safeParse({
       id: '10000000-0000-4000-8000-000000000001',
       plan,

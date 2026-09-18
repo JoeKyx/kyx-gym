@@ -45,6 +45,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
   ActiveWorkoutProps
 >((props, ref) => {
   type InputValue = {
+    effort?: string | number;
     weight?: number;
     reps?: number;
     distance?: number;
@@ -88,6 +89,8 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
         workout.workout_items.forEach((item) => {
           item.sets.forEach((set) => {
             newInputValues[set.id] = {
+              effort:
+                prevInputValues[set.id]?.effort ?? set.effort ?? undefined,
               weight:
                 prevInputValues[set.id]?.weight ??
                 set.weight ??
@@ -151,7 +154,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
 
   const handleInputChange = (
     set: Set,
-    field: 'weight' | 'reps' | 'speed' | 'distance',
+    field: 'weight' | 'reps' | 'speed' | 'distance' | 'effort',
     value: string
   ) => {
     const newValues = { ...inputValues[set.id], [field]: value };
@@ -179,6 +182,7 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       reps: numberOrNull(values.reps),
       speed: numberOrNull(values.speed),
       distance: numberOrNull(values.distance),
+      effort: numberOrNull(values.effort),
       is_finished: !set.is_finished,
     };
     if (
@@ -187,6 +191,15 @@ const ActiveWorkout: FC<ActiveWorkoutProps> = forwardRef<
       )
     ) {
       setError('Bitte gültige Satzwerte eingeben.');
+      return;
+    }
+    if (
+      updated.effort !== null &&
+      (!Number.isFinite(updated.effort) ||
+        updated.effort < 0 ||
+        updated.effort > 10)
+    ) {
+      setError('Bitte eine Anstrengung zwischen 0 und 10 eingeben.');
       return;
     }
     if (
