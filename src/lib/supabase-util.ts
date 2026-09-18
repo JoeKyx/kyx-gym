@@ -402,6 +402,7 @@ export const updateSetInDB = async (
   update: Set
 ): Promise<SupabaseUtilReturnType<DBSet>> => {
   const updateSet: UpdateSet = {
+    effort: update.effort,
     weight: update.weight,
     reps: update.reps,
     distance: update.distance,

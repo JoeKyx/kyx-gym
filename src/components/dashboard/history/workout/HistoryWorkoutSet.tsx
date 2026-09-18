@@ -90,6 +90,11 @@ const HistoryWorkoutSet: FC<HistoryWorkoutSetProps> = ({
           )}
         </div>
       </div>
+      {set.is_finished && set.effort != null && (
+        <p className='ml-16 text-xs text-gray-500'>
+          Anstrengung: {set.effort} / 10
+        </p>
+      )}
     </div>
   );
 };

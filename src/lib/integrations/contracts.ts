@@ -142,7 +142,9 @@ export const inputs = {
   exercise_metadata: z
     .object({ kind: z.enum(['categories', 'muscles']), ...page })
     .strict(),
-  exercise_history: z.object({ exercise_id: id, ...page }).strict(),
+  exercise_history: z
+    .object({ exercise_id: id, after: id.optional(), limit: page.limit })
+    .strict(),
   search_exercises: z
     .object({ query: z.string().trim().max(120).default(''), ...page })
     .strict(),

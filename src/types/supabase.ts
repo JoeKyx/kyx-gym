@@ -565,6 +565,7 @@ export interface Database {
       };
       sets: {
         Row: {
+          effort: number | null;
           // Additive planning migration; optional until remote type regeneration.
           target_weight?: number | null;
           target_reps?: number | null;
@@ -582,6 +583,7 @@ export interface Database {
           workout_item_id: number;
         };
         Insert: {
+          effort?: number | null;
           distance?: number | null;
           finished_at?: string | null;
           id?: number;
@@ -596,6 +598,7 @@ export interface Database {
           workout_item_id: number;
         };
         Update: {
+          effort?: number | null;
           distance?: number | null;
           finished_at?: string | null;
           id?: number;

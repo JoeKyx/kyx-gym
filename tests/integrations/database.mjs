@@ -41,6 +41,12 @@ await db.exec(
 await db.exec(
   readFileSync('supabase/migrations/20260916180415_cardio_sessions.sql', 'utf8')
 );
+await db.exec(
+  readFileSync(
+    'supabase/migrations/20260918040026_set_effort_and_exercise_history.sql',
+    'utf8'
+  )
+);
 const alice = '00000000-0000-4000-8000-000000000001',
   bob = '00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users values ($1),($2)', [alice, bob]);
@@ -195,6 +201,7 @@ await check(
     assert.equal(w.items[0].sets.length, 2);
     assert.equal(w.items[0].sets[0].actual, null);
     assert.equal(w.items[0].sets[0].target.weight, 50);
+    assert.equal(w.planned_sets[0].actual, null);
     assert.equal((await run('list_workouts'))[0].completed_volume, 0);
   }
 );
@@ -241,6 +248,7 @@ await check(
     assert.equal(after.items[0].sets.length, 1);
     assert.equal(after.planned_sets.length, 2);
     assert.equal(after.planned_sets[0].actual.weight, 40);
+    assert.equal(after.planned_sets[0].actual.effort, null);
     assert.equal(after.planned_sets[1].confirmed, false);
     assert.equal(after.planned_sets[1].actual, null);
     assert.equal(after.planned_sets[1].target.weight, 50);
@@ -560,6 +568,91 @@ await check(
     assert.deepEqual(
       ids(await list({ after: 9001 })),
       [9004, 9002, 9003, 9006, 9005]
+    );
+  }
+);
+await check(
+  'Per-set effort and exercise execution history stay scoped and chronological',
+  async () => {
+    const owner = '00000000-0000-4000-8000-000000000004';
+    await db.query('insert into auth.users values ($1)', [owner]);
+    await db.query(
+      `insert into workouts(id,name,status,userid,created_at) values
+      (9302,'older','finished',$1,'2026-01-01T00:00:00Z'),
+      (9301,'newer','active',$1,'2026-03-01T00:00:00Z'),
+      (9303,'foreign','finished',$2,'2026-04-01T00:00:00Z')`,
+      [owner, bob]
+    );
+    await db.query(
+      `insert into workout_items(id,exerciseid,workout,position,is_finished) values
+      (9401,1,9301,1,true),(9402,1,9301,2,true),
+      (9403,1,9302,1,true),(9404,2,9301,3,true),
+      (9405,1,9303,1,true),(9406,1,9302,2,false)`
+    );
+    await db.query(
+      `insert into sets(userid,workout_id,workout_item_id,position,type,is_finished,weight,reps,speed,distance,effort) values
+      ($1,9301,9401,1,'normal',true,80,5,null,null,8.5),
+      ($1,9301,9401,2,'normal',true,75,6,null,null,null),
+      ($1,9301,9402,1,'normal',true,70,8,null,null,0),
+      ($1,9302,9403,1,'normal',true,60,10,null,null,10),
+      ($1,9301,9404,1,'normal',true,99,1,null,null,9),
+      ($2,9303,9405,1,'normal',true,100,1,null,null,9),
+      ($1,9302,9406,1,'normal',false,50,12,null,null,7)`,
+      [owner, bob]
+    );
+    await assert.rejects(
+      db.query('update sets set effort=10.1 where workout_item_id=9401')
+    );
+    await assert.rejects(
+      db.query('update sets set effort=-0.1 where workout_item_id=9401')
+    );
+    const history = (args = {}, user = owner) =>
+      run('exercise_history', { exercise_id: 1, ...args }, user);
+    const executions = await history();
+    assert.deepEqual(
+      executions.map((row) => row.workout_item_id),
+      [9402, 9401, 9403]
+    );
+    assert.deepEqual(
+      executions[1].sets.map((set) => set.effort),
+      [8.5, null]
+    );
+    assert.equal(executions[1].sets[0].weight, 80);
+    assert.equal(executions[1].started_at, '2026-03-01T00:00:00+00:00');
+    assert.deepEqual(
+      (await history({ limit: 1 })).map((row) => row.workout_item_id),
+      [9402]
+    );
+    assert.deepEqual(
+      (await history({ limit: 1, after: 9402 })).map(
+        (row) => row.workout_item_id
+      ),
+      [9401]
+    );
+    assert.deepEqual(
+      (await history({ limit: 1, after: 9401 })).map(
+        (row) => row.workout_item_id
+      ),
+      [9403]
+    );
+    assert.deepEqual(await history({ after: 9403 }), []);
+    assert.deepEqual(
+      (await history({}, bob)).map((row) => row.workout_item_id),
+      [9405]
+    );
+    await assert.rejects(history({ after: 9405 }));
+    await assert.rejects(history({ after: 9404 }));
+    await assert.rejects(history({ after: 9406 }));
+    const workout = await run('get_workout', { id: 9301 }, owner);
+    assert.equal(workout.items[0].sets[0].actual.effort, 8.5);
+    const sets = await run(
+      'get_workout_sets',
+      { workout_id: 9301, workout_item_id: 9401 },
+      owner
+    );
+    assert.deepEqual(
+      sets.map((set) => set.actual.effort),
+      [8.5, null]
     );
   }
 );
